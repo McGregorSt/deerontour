@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="50" viewBox="0 0 300 50">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 20 10" refX="18" refY="5"
+            markerWidth="16" markerHeight="10" orient="auto">
+      <!-- cieńszy i dłuższy grot -->
+      <polygon points="0 2, 18 5, 8 8" fill="black"/>
+    </marker>
+  </defs>
+  
+  <!-- prosty trzpień -->
+  <line x1="10" y1="25" x2="280" y2="25"
+        stroke="black" stroke-width="2"
+        stroke-linecap="round"
+        marker-end="url(#arrowhead)" />
+</svg>
