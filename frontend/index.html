@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    /* Reset */
+    @import url('https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      color: #333;
+      background: #fff;
+      line-height: 1.5;
+      /* font-family: "Smooch Sans", sans-serif;
+      font-optical-sizing: auto;
+      font-weight: normal;
+      font-style: normal; */
+    }
+
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav li {
+      font-weight: 600;
+    }
+
+    /* Banner */
+    .banner {
+      position: relative;
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+      font-size: 2rem;
+      font-weight: 700;
+      padding: 0 1rem;
+      text-align: center;
+    }
+
+    /* Main layout */
+    main {
+      display: flex;
+      max-width: 1200px;
+      margin: 2rem auto;
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+
+    /* Posts Grid */
+    .posts {
+      flex: 3;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    article.post {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+    }
+
+    article.post img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    article.post h3 {
+      padding: 0.75rem 1rem 0 1rem;
+      font-size: 1.25rem;
+    }
+
+    article.post p {
+      padding: 0.5rem 1rem 1rem 1rem;
+      flex-grow: 1;
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    /* Sidebar */
+    aside.sidebar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .map-placeholder {
+      background: #eee;
+      height: 200px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .about-us {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+
+    .about-us img {
+      width: 100%;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .about-us p {
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .social-icons a {
+      color: #555;
+    }
+
+    .social-icons a:hover {
+      color: #0066cc;
+    }
+
+    /* Footer */
+    footer {
+      background: #f3f3f3;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      main {
+        flex-direction: column;
+      }
+
+      aside.sidebar {
+        order: -1;
+        margin-bottom: 2rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 1rem;
+        background: #fafafa;
+        position: absolute;
+        top: 64px;
+        right: 2rem;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        display: none;
+      }
+
+      nav ul.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
+        cursor: pointer;
+        font-size: 1.5rem;
+        user-select: none;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .menu-toggle {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">TravelBlog</div>
+    <nav>
+      <div class="menu-toggle" id="menuToggle">&#9776;</div>
+      <ul id="navMenu">
+        <li><a href="#">Posts</a></li>
+        <li><a href="#">Tours</a></li>
+        <li><a href="#">Cooperation</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="banner">
+    Odkryj świat z nami!
+  </div>
+
+  <main>
+    <aside class="sidebar">
+      <div class="map-placeholder">Mapa interaktywna (tu będzie)</div>
+      <section class="about-us">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="About us photo" />
+        <p>Cześć! Jesteśmy pasjonatami podróży, którzy chcą dzielić się swoimi przygodami i poradami.</p>
+      </section>
+      <div class="social-icons">
+        <a href="#" aria-label="Facebook">🔵</a>
+        <a href="#" aria-label="Instagram">📸</a>
+        <a href="#" aria-label="Twitter">🐦</a>
+      </div>
+    </aside>
+
+    <section class="posts">
+      <article class="post">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80"
+          alt="Post 1" />
+        <h3>Rajskie plaże na Bali</h3>
+        <p>Zapraszamy na relację z naszej podróży na Bali. Piękne widoki i egzotyczne smaki!</p>
+      </article>
+      <article class="post">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80"
+          alt="Post 2" />
+        <h3>Wędrówki po Alpach</h3>
+        <p>Odkryj z nami najpiękniejsze szlaki alpejskie i podziwiaj panoramy górskie.</p>
+      </article>
+      <article class="post">
+        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80"
+          alt="Post 3" />
+        <h3>Miasta pełne historii</h3>
+        <p>Zwiedzamy europejskie stolice pełne zabytków i kultury. Dołącz do nas!</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>Zapisz się do newslettera i bądź na bieżąco z naszymi podróżami!</p>
+    <p>© 2025 TravelBlog. Wszystkie prawa zastrzeżone.</p>
+  </footer>
+
+  <script>
+    // Prosty toggle menu mobilnego
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+  </script>
+
+</body>
+
+</html>

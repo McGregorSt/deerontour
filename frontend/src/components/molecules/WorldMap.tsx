@@ -1,0 +1,58 @@
+import React from 'react'
+import styled from 'styled-components'
+import MapPoint from './MapPoint'
+import MapBackground from '../atoms/MapBackground'
+
+const StyledWorldMap = styled.div`
+    position: relative;
+    padding: 0 4rem 6rem 0rem;
+`
+
+const StyledDiv = styled.div`
+    width: 20px;
+    height: 20px;
+    border-radius: 1vh;
+    background-color: orangered;
+    margin: 10px;
+    position: absolute;
+    top: 50%;
+    left: 80.0187%;
+    opacity: 0.9;
+    
+`
+
+export interface PointMap {
+  country: string,
+  x: string,
+  y: string,
+  description: string,
+}
+const mapPoints: PointMap[] = [
+  {
+    country: 'Vietnam',
+    x: '75.9%',
+    y: '50.7%',
+    description: 'Viet Nam',
+  },
+  {
+    country: 'Iceland',
+    x: '41.83%',
+    y: '19.6%',
+    description: 'lorem llorem',
+  },
+]
+
+
+const WorldMap: React.FC<{}> = () => {
+  return (
+    <StyledWorldMap>
+      <MapBackground>
+      {mapPoints.map((point: PointMap) => (
+        <MapPoint country={point.country} x={point.x} y={point.y} description={point.description} />
+      ))}
+      </MapBackground>
+    </StyledWorldMap>
+  )
+}
+
+export default WorldMap
