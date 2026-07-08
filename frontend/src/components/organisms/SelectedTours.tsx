@@ -6,6 +6,7 @@ import { IPost } from '../../support/types'
 import Header from '../atoms/Header'
 import PostPreview from './PostPreview'
 import UserPage from '../../template/UserPage'
+import { BASE_URL } from '../../globals/host'
 
 const StyledWrapper = styled.div`
   display: flex;
@@ -37,7 +38,7 @@ const SelectedTours = () => {
       try {
         setLoading(true)
         setError(null)
-        const response = await fetch(`http://localhost:9090/blog/tours/${continent}`, {
+        const response = await fetch(`http://${BASE_URL}/blog/tours/${continent}`, {
           method: 'get',
         })
         if (!response.ok) {
