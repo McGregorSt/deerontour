@@ -8,7 +8,7 @@ const StyledHomepage = styled.div``
 const StyledLandingPage = styled.div`
   width: 100%;
   height: 100vh;
-  background-image: url('/assets/homepage/IMG_2606.jpg');
+  background-image: url('/assets/homepage/IMG_2606.JPG');
   background-size: cover;
   background-repeat: no-repeat;
   scale: 1;
