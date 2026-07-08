@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import DetailsTemplate from '../template/DetailsTemplate'
 import { IPost } from '../support/types'
-import { BASE_URL } from '../globals/host'
 
 const Tour = () => {
   const [postData, setPostData] = useState<IPost | null>(null)
@@ -9,7 +8,7 @@ const Tour = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`http://${BASE_URL}/blog/tours/details/${country.toLowerCase()}`, {
+      const response = await fetch(`/blog/tours/details/${country.toLowerCase()}`, {
         method: 'get',
       })
       const data = await response.json()

@@ -8,7 +8,7 @@ import PostTitle from '../atoms/Post/PostTitle'
 import PostGallery from './PostGallery'
 import PostLead from '../atoms/Post/PostLead'
 import PostTableOfContents from '../molecules/PostTableOfContents'
-import { BASE_URL } from '../../globals/host'
+
 
 const StyledPostWrapper = styled.div`
   display: flex;
@@ -67,7 +67,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
       try {
         setLoading(true)
         setError(null)
-        const response = await fetch(`http://${BASE_URL}/blog/tours/details/${country?.toLowerCase()}`, {
+        const response = await fetch(`/blog/tours/details/${country?.toLowerCase()}`, {
           method: 'get',
         })
         if (!response.ok) {
