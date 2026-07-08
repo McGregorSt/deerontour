@@ -6,7 +6,7 @@ import Post from './Post'
 import { IPost } from '../../support/types'
 import Header from '../atoms/Header'
 import { useLocation } from 'react-router-dom'
-import { BASE_URL } from '../../globals/host'
+
 
 const StyledToursHomepage = styled.div`
   /* padding: 0 15%; */
@@ -59,7 +59,7 @@ const RecentPosts = () => {
   const [postsData, setPostsData] = useState([])
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`http://${BASE_URL}/blog/tours`, {
+      const response = await fetch(`/blog/tours`, {
         method: 'get',
       })
       const data = await response.json()
