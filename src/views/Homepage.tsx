@@ -25,9 +25,7 @@ const Home = () => {
   return (
     <UserPage>
       <StyledHomepage>
-        <StyledLandingPage >
-          <img src="/assets/homepage/IMG_2606.JPG" alt="Landing Page" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </StyledLandingPage>
+        <StyledLandingPage />
         <RecentPosts />
         <WorldMap />
       </StyledHomepage>
