@@ -7,13 +7,22 @@ export interface IImage {
 }
 
 const StyledGalleryGrid = styled.div<{ imagesCount: number }>`
-  width: 40vw;
+  width: min(100%, 40vw);
   height: 35rem;
   display: grid;
-  grid-template-columns: ${(props) => `repeat(${props.imagesCount}, minmax(${props.imagesCount}vw, 1fr))`};
-  grid-template-rows: ${(props) => `repeat(${props.imagesCount}, minmax(1fr, 1fr))`};
+  grid-template-columns: repeat(${(props) => props.imagesCount}, minmax(0, 1fr));
   gap: 2%;
   cursor: pointer;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+    height: 24rem;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 18rem;
+  }
 
   & > * {
     background-size: cover;

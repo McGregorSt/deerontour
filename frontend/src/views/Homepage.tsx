@@ -8,17 +8,26 @@ const StyledHomepage = styled.div``
 const StyledLandingPage = styled.div`
   width: 100%;
   height: 100vh;
+  min-height: 560px;
   background-image: url('/assets/homepage/IMG_2606.JPG');
   background-size: cover;
   background-repeat: no-repeat;
   scale: 1;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: 70vh;
+    min-height: 420px;
+  }
 `
 
 const Home = () => {
   return (
     <UserPage>
       <StyledHomepage>
-        <StyledLandingPage />
+        <StyledLandingPage >
+          <img src="/assets/homepage/IMG_2606.JPG" alt="Landing Page" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </StyledLandingPage>
         <RecentPosts />
         <WorldMap />
       </StyledHomepage>

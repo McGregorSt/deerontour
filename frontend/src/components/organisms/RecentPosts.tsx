@@ -1,72 +1,54 @@
 import React, { useEffect, useState } from 'react'
-import UserPage from '../../template/UserPage'
 import styled from 'styled-components'
 import PostCard from './PostCard'
-import Post from './Post'
 import { IPost } from '../../support/types'
 import Header from '../atoms/Header'
-import { useLocation } from 'react-router-dom'
+import { fetchPosts } from '../../support/api'
 
-
-const StyledToursHomepage = styled.div`
-  /* padding: 0 15%; */
-  grid-gap: 3vw;
-  display: flex;
-  overflow-x: auto;
-  white-space: nowrap;
-  overflow: no;
-  padding-bottom: 3vw;
-  padding-top: 3vw;
-
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-  }
-`
 const StyledHeader = styled.div`
-  /* padding-left: 30rem; */
+  padding: 0 1.5rem;
 `
-// const StyledPosts = styled.div`
-//   width: 100%;
-//   padding-left: 30rem;
-// `
+
 const StyledWrapper = styled.div`
   padding-top: 5rem;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding-top: 2.5rem;
+  }
 `
 
 const StyledRecentPosts = styled.div`
-  /* width: 70%; */
-  padding: 5rem 20rem 0 20rem;
-  /* padding-right: 5rem; */
+  padding: 2rem 1.5rem 3rem;
   display: flex;
   flex-direction: row;
-  grid-gap: 3vw;
+  gap: 1.5rem;
   justify-content: flex-start;
   overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 3vw;
-  padding-top: 3vw;
+  align-items: stretch;
 
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem 1rem 2rem;
+    flex-direction: column;
+    white-space: normal;
+    overflow-x: visible;
   }
 `
-interface ITours {
-  onClick: React.MouseEvent<HTMLElement>
-}
-
 const RecentPosts = () => {
   // const location = useLocation()
-  const [postsData, setPostsData] = useState([])
+  const [postsData, setPostsData] = useState<IPost[]>([])
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch(`/blog/tours`, {
-        method: 'get',
-      })
-      const data = await response.json()
-      const { posts } = data
+    const loadPosts = async () => {
+      const posts = await fetchPosts()
       setPostsData(posts)
     }
-    fetchPosts()
+
+    loadPosts()
   }, [])
   // const isHomepage = location.pathname === '/'
 

@@ -8,6 +8,7 @@ import PostTitle from '../atoms/Post/PostTitle'
 import PostGallery from './PostGallery'
 import PostLead from '../atoms/Post/PostLead'
 import PostTableOfContents from '../molecules/PostTableOfContents'
+import { fetchPostByCountry } from '../../support/api'
 
 
 const StyledPostWrapper = styled.div`
@@ -16,11 +17,13 @@ const StyledPostWrapper = styled.div`
 `
 
 const StyledPostContainer = styled.div`
-  width: 50%;
+  width: min(100%, 860px);
   margin: 0 auto;
+  padding: 0 1rem 2rem;
 
   @media (max-width: 1200px) {
-    padding-left: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 `
 
@@ -32,7 +35,12 @@ const StyledPost = styled.div`
   border: 1px solid #ddd;
   margin-top: 3vh;
   padding: 20px 40px;
-  min-width: 520px;
+  width: 100%;
+  overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    padding: 16px 18px;
+  }
 `
 
 const StyledPostSection = styled.section`
@@ -67,15 +75,8 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
       try {
         setLoading(true)
         setError(null)
-        const response = await fetch(`/blog/tours/details/${country?.toLowerCase()}`, {
-          method: 'get',
-        })
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-        const data = await response.json()
-        console.log('fetched post data:', data)
-        setPost(data)
+        const fetchedPost = await fetchPostByCountry(country || '')
+        setPost(fetchedPost)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load post'
         console.error('Error fetching post:', errorMessage)
