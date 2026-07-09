@@ -4,8 +4,10 @@ import MapPoint from './MapPoint'
 import MapBackground from '../atoms/MapBackground'
 
 const StyledWorldMap = styled.div`
-    position: relative;
-    padding: 0 4rem 6rem 0rem;
+  position: relative;
+  padding: 0 1.5rem 3rem;
+  width: 100%;
+  overflow-x: auto;
 `
 
 const StyledDiv = styled.div`
@@ -47,8 +49,8 @@ const WorldMap: React.FC<{}> = () => {
   return (
     <StyledWorldMap>
       <MapBackground>
-      {mapPoints.map((point: PointMap) => (
-        <MapPoint country={point.country} x={point.x} y={point.y} description={point.description} />
+      {mapPoints.map((point: PointMap, index: number) => (
+        <MapPoint key={`${point.country}-${index}`} country={point.country} x={point.x} y={point.y} description={point.description} />
       ))}
       </MapBackground>
     </StyledWorldMap>

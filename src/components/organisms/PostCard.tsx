@@ -11,8 +11,8 @@ import PostSubtitle from '../atoms/Post/PostSubtitle'
 
 const StyledPostHeader = styled.div``
 const StyledPostCard = styled.div`
-  height: 36rem;
-  width: 16vw;
+  min-height: 36rem;
+  width: min(16vw, 280px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -20,6 +20,7 @@ const StyledPostCard = styled.div`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px -8px;
   border-radius: 20px;
   position: relative;
+  overflow: hidden;
 
   * {
     background-color: #fff;
@@ -50,12 +51,18 @@ const StyledContent = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+  padding: 0 1rem 1rem;
 `
+
 
 const StyledPostCardPhoto = styled.div`
   & > * {
     display: flex;
     flex-direction: column;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `
 

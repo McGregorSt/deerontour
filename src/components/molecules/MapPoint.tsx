@@ -11,7 +11,7 @@ interface MapPointProps {
   animationDelay?: string
 }
 
-const StyledMapPoint = styled('button')<MapPointProps>`
+const StyledMapPoint = styled('button')<{ $x: string; $y: string; $animationDelay?: string }>`
   width: 0.9rem;
   height: 0.9rem;
   padding: 0;
@@ -19,8 +19,8 @@ const StyledMapPoint = styled('button')<MapPointProps>`
   border: 0;
   border-radius: 50%;
   background-color: transparent;
-  left: ${({ x }) => x};
-  top: ${({ y }) => y};
+  left: ${({ $x }) => $x};
+  top: ${({ $y }) => $y};
   cursor: pointer;
 
   & > span {
@@ -35,7 +35,7 @@ const StyledMapPoint = styled('button')<MapPointProps>`
     background-color: red;
     box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
     animation: pulse-animation 2.6s ease-in-out infinite;
-    animation-delay: ${({ animationDelay }) => animationDelay || '0s'};
+    animation-delay: ${({ $animationDelay }) => $animationDelay || '0s'};
     transform-origin: center center;
     will-change: transform, box-shadow, opacity;
     backface-visibility: hidden;
@@ -66,7 +66,7 @@ const StyledMapPoint = styled('button')<MapPointProps>`
   }
 `
 
-const StyledPopup = styled('div')<MapPointProps>`
+const StyledPopup = styled('div')`
   width: 250px;
   height: auto;
   max-width: 80vw;
@@ -106,10 +106,10 @@ const MapPoint: React.FC<PointMap> = ({ country, x, y, description }) => {
   }
 
   return (
-    <StyledMapPoint country={country} x={x} y={y} description={description} animationDelay={animationDelay}>
+    <StyledMapPoint $x={x} $y={y} $animationDelay={animationDelay}>
       <span onClick={handleCountryClick} onMouseOver={() => setDisplayPopup(true)} onMouseLeave={() => setDisplayPopup(false)} />
       {displayPopup && (
-        <StyledPopup country={country} x={x} y={y} description={description}>
+        <StyledPopup>
           <h3 style={{ margin: '8px 0' }}>{country}</h3>
           <p style={{ margin: 0 }}>{description}</p>
         </StyledPopup>

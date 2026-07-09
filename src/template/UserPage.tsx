@@ -6,6 +6,10 @@ import styled from 'styled-components'
 
 const StyledUserPage = styled.div`
   margin-top: 10vh;
+
+  @media (max-width: 768px) {
+    margin-top: 0;
+  }
 `
 
 interface IProps {

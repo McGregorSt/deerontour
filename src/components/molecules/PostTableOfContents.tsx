@@ -2,20 +2,20 @@ import React from 'react'
 import styled from 'styled-components'
 
 const StyledToc = styled.aside`
- background-color: #fafafa;
+  background-color: #fafafa;
   display: flex;
   flex-direction: column;
-  align-items: left;
+  align-items: flex-start;
   border: 1px solid #ddd;
-  margin-top: 3vh;
+  margin: 3vh auto 0;
   padding: 20px 40px;
-  position: fixed;
-  left: 20px;
-  width: 18vw;
+  width: min(90%, 320px);
   z-index: 990;
 
   @media (max-width: 1200px) {
-    display: none;
+    position: static;
+    width: min(92%, 720px);
+    margin: 1.5rem auto 0;
   }
 `
 

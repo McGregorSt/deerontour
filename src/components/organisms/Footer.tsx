@@ -11,20 +11,31 @@ const StyledFooter = styled.div`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px -8px;
   display: flex;
   justify-content: space-around;
+  align-items: flex-start;
+  gap: 2rem;
   margin-top: auto;
+  padding: 2rem 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem 1rem;
+  }
 `
 
 const StyledFooterButtons = styled.div`
-  margin: 50px 0px 50px -230px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  align-items: left;
-  padding: 5px 10px;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
   & > * {
     text-decoration: none;
     color: #eee;
     cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 `
 
