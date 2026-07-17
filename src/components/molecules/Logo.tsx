@@ -12,8 +12,15 @@ const StyledLogo = styled.div<{ $large: boolean }>`
   justify-content: space-between;
   align-items: center;
   font-size: 40px;
-
   scale: ${({ $large }) => ($large ? '0.7' : '0.3')};
+
+  @media (max-width: 768px) {
+    scale: 0.4;
+  }
+
+  @media (max-width: 480px) {
+    scale: 0.6;
+  }
 `
 
 const Logo: React.FC<LogoProps> = ({ large }) => {
