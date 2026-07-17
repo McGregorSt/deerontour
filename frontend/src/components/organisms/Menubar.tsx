@@ -24,7 +24,7 @@ const StyledMenubar = styled.div`
 
   @media (max-width: 768px) {
     height: auto;
-    min-height: 64px;
+    height: 10vh;
     padding: 0.75rem 1rem;
     margin-top: 0;
   }
@@ -78,13 +78,31 @@ const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   top: 100%;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
   padding: 1rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0)' : 'translateY(-8px)')};
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
   transition: all 0.2s ease;
+  z-index: 996;
+  background: rgba(255, 255, 255, 0.386);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
+
+  & > * {
+    text-decoration: none;
+    color: #827f6a;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-radius: 999px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   @media (max-width: 768px) {
     display: flex;
