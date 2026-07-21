@@ -33,11 +33,12 @@ const StyledMenubar = styled.div`
 const StyledMenuButtons = styled.div`
   display: flex;
   align-items: center;
+  overflow: visible;
   gap: 0.5rem;
 
   & > * {
     text-decoration: none;
-    color: #827f6a;
+    color: #47463a;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     border-radius: 999px;
@@ -56,7 +57,7 @@ const StyledMobileMenuToggle = styled.button`
   display: none;
   border: none;
   background: transparent;
-  color: #827f6a;
+  color: #3a3a37;
   font-size: 1rem;
   font-weight: 600;
   min-width: 44px;
@@ -73,29 +74,41 @@ const StyledMobileMenuToggle = styled.button`
 const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   display: none;
   flex-direction: column;
-  gap: 0.5rem;
-  position: absolute;
-  top: 100%;
+  /* gap: 0.5rem; */
+  position: fixed;
+  top: 11vh; /* place below the menubar */
   left: 0;
   right: 0;
-  padding: 1rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  margin-top: 0px;
+  /* border-radius: 20px; */
+  padding: 2rem;
   transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0)' : 'translateY(-8px)')};
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
   transition: all 0.2s ease;
   z-index: 996;
   background: rgba(255, 255, 255, 0.386);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  /* -webkit-backdrop-filter: blur(20px); */
+  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); */
   text-align: center;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
+  /* isolation: isolate;
+  will-change: backdrop-filter; */
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: -1; */
+  }
 
   & > * {
     text-decoration: none;
-    color: #827f6a;
-    padding: 0.5rem 0.75rem;
+    color: #47463a;
     cursor: pointer;
     border-radius: 999px;
     min-height: 44px;
@@ -136,25 +149,27 @@ const Menubar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <StyledMenubar>
-      <Logo large={false} />
-      <StyledMenuButtons>
-        {menuItems.map((item: { button: string; link: string }, index) => (
-          <Link
-            key={index}
-            to={item.link}
-          >
-            <MenuButton text={item.button} />
-          </Link>
-        ))}
-      </StyledMenuButtons>
-      <StyledMobileMenuToggle
-        type='button'
-        aria-label='Open navigation menu'
-        onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-      >
-        ☰
-      </StyledMobileMenuToggle>
+    <>
+      <StyledMenubar>
+        <Logo large={false} />
+        <StyledMenuButtons>
+          {menuItems.map((item: { button: string; link: string }, index) => (
+            <Link
+              key={index}
+              to={item.link}
+            >
+              <MenuButton text={item.button} />
+            </Link>
+          ))}
+        </StyledMenuButtons>
+        <StyledMobileMenuToggle
+          type='button'
+          aria-label='Open navigation menu'
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+        >
+          ☰
+        </StyledMobileMenuToggle>
+      </StyledMenubar>
       <StyledMobileMenu $isOpen={isMobileMenuOpen}>
         {menuItems.map((item: { button: string; link: string }, index) => (
           <Link
@@ -166,7 +181,7 @@ const Menubar = () => {
           </Link>
         ))}
       </StyledMobileMenu>
-    </StyledMenubar>
+    </>
   )
 }
 
