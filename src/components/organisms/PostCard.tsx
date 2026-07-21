@@ -44,6 +44,11 @@ const StyledPostCard = styled.div`
     font-size: 24px;
     text-transform: uppercase;
   }
+  @media (max-width: 768px) {
+    height: 40rem;
+    width: 30vw;
+
+  }
 `
 
 

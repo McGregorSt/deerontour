@@ -34,7 +34,7 @@ const StyledRecentPosts = styled.div`
 
   @media (max-width: 768px) {
     padding: 1rem 1rem 2rem;
-    flex-direction: column;
+    flex-direction: row;
     white-space: normal;
     overflow-x: visible;
   }
