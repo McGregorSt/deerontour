@@ -35,8 +35,8 @@ const StyledRecentPosts = styled.div`
   @media (max-width: 768px) {
     padding: 1rem 1rem 2rem;
     flex-direction: row;
-    white-space: normal;
-    overflow-x: visible;
+    white-space: nowrap;
+    overflow-x: auto;
   }
 `
 const RecentPosts = () => {
