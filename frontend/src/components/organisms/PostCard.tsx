@@ -21,6 +21,7 @@ const StyledPostCard = styled.div`
   border-radius: 20px;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 
   * {
     background-color: #fff;
@@ -45,9 +46,8 @@ const StyledPostCard = styled.div`
     text-transform: uppercase;
   }
   @media (max-width: 768px) {
-    height: 40rem;
-    width: 30vw;
-
+    height: 20rem;
+    width: 300px;
   }
 `
 
@@ -67,7 +67,7 @@ const StyledPostCardPhoto = styled.div`
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    /* width: 100%; */
   }
 `
 
