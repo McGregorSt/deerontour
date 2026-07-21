@@ -10,7 +10,6 @@ const StyledHeader = styled.div`
 `
 
 const StyledWrapper = styled.div`
-  border: 5px solid red;
   padding-top: 5rem;
   width: 100%;
 
