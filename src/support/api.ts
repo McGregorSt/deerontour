@@ -1,7 +1,8 @@
 import { mockPosts } from './mockPosts'
 import { IPost } from './types'
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || ''
+const API_BASE_URL = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/$/, '')
+const shouldUseMockFallback = process.env.REACT_APP_USE_MOCKS === 'true' || process.env.NODE_ENV !== 'production'
 
 const getJson = async <T>(url: string, fallback: T): Promise<T> => {
   try {
@@ -20,14 +21,28 @@ const getJson = async <T>(url: string, fallback: T): Promise<T> => {
     }
 
     return await response.json()
-  } catch {
-    return fallback
+  } catch (error) {
+    if (shouldUseMockFallback) {
+      console.warn('Falling back to mock data:', error)
+      return fallback
+    }
+
+    throw error
   }
 }
 
 export const fetchPosts = async (): Promise<IPost[]> => {
-  const data = await getJson<{ posts?: IPost[] }>(`/blog/tours`, { posts: mockPosts })
-  return Array.isArray(data.posts) && data.posts.length ? data.posts : mockPosts
+  const data = await getJson<{ posts?: IPost[] }>(`/blog/tours`, { posts: [] })
+
+  if (Array.isArray(data.posts) && data.posts.length) {
+    return data.posts
+  }
+
+  if (shouldUseMockFallback) {
+    return mockPosts
+  }
+
+  return []
 }
 
 export const fetchPostByCountry = async (country: string): Promise<IPost | null> => {
@@ -36,5 +51,9 @@ export const fetchPostByCountry = async (country: string): Promise<IPost | null>
     return data.post
   }
 
-  return mockPosts.find((item) => item.country.toLowerCase() === country.toLowerCase()) || mockPosts[0] || null
+  if (shouldUseMockFallback) {
+    return mockPosts.find((item) => item.country.toLowerCase() === country.toLowerCase()) || mockPosts[0] || null
+  }
+
+  return null
 }
