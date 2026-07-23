@@ -5,7 +5,12 @@ import MapBackground from '../atoms/MapBackground'
 
 const StyledWorldMap = styled.div`
   position: relative;
-  padding: 0 1.5rem 3rem;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  margin: auto;
+  left: -3%;
+  padding-bottom: 3rem;
   width: 100%;
   overflow-x: auto;
 `
@@ -20,6 +25,8 @@ const StyledDiv = styled.div`
     top: 50%;
     left: 80.0187%;
     opacity: 0.9;
+
+ 
     
 `
 
@@ -32,14 +39,14 @@ export interface PointMap {
 const mapPoints: PointMap[] = [
   {
     country: 'Vietnam',
-    x: '75.9%',
-    y: '50.7%',
+    x: '77.9%',
+    y: '52.7%',
     description: 'Viet Nam',
   },
   {
     country: 'Iceland',
-    x: '41.83%',
-    y: '19.6%',
+    x: '43.83%',
+    y: '20.6%',
     description: 'lorem llorem',
   },
 ]

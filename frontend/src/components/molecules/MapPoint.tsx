@@ -22,6 +22,12 @@ const StyledMapPoint = styled('button')<{ $x: string; $y: string; $animationDela
   left: ${({ $x }) => $x};
   top: ${({ $y }) => $y};
   cursor: pointer;
+  
+  @media (max-width: 768px) {
+    scale: 0.5;
+    width: 0.4rem;
+    height: 0.4rem;
+  }
 
   & > span {
     content: '';
@@ -39,7 +45,10 @@ const StyledMapPoint = styled('button')<{ $x: string; $y: string; $animationDela
     transform-origin: center center;
     will-change: transform, box-shadow, opacity;
     backface-visibility: hidden;
-    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, opacity 260ms ease;
+    transition:
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 260ms ease,
+      opacity 260ms ease;
   }
 
   @keyframes pulse-animation {
@@ -73,7 +82,7 @@ const StyledPopup = styled('div')`
   background-color: #b1b1ea;
   color: #333;
   z-index: 99;
-  position: absolute;
+  position: fixed;
   top: -10px;
   left: 110%;
   transform: translateY(-50%) scale(0.92);
@@ -86,7 +95,9 @@ const StyledPopup = styled('div')`
   padding: 12px;
   text-align: center;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
-  transition: transform 180ms ease, opacity 180ms ease;
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease;
   opacity: 0.98;
 
   &:hover {
@@ -106,8 +117,16 @@ const MapPoint: React.FC<PointMap> = ({ country, x, y, description }) => {
   }
 
   return (
-    <StyledMapPoint $x={x} $y={y} $animationDelay={animationDelay}>
-      <span onClick={handleCountryClick} onMouseOver={() => setDisplayPopup(true)} onMouseLeave={() => setDisplayPopup(false)} />
+    <StyledMapPoint
+      $x={x}
+      $y={y}
+      $animationDelay={animationDelay}
+    >
+      <span
+        onClick={handleCountryClick}
+        onMouseOver={() => setDisplayPopup(true)}
+        onMouseLeave={() => setDisplayPopup(false)}
+      />
       {displayPopup && (
         <StyledPopup>
           <h3 style={{ margin: '8px 0' }}>{country}</h3>
