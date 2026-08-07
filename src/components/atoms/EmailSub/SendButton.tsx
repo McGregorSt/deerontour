@@ -5,12 +5,15 @@ const StyledSendButton = styled.button`
 max-width: 10rem;
   display: inline-block;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
   color: #000;
+    color: #4e4d47;
+
   font-weight: 500;
   font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
   border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

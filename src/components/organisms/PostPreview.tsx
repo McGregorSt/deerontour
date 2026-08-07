@@ -87,7 +87,7 @@ const PostPreview: React.FC<{ post: IPost }> = ({ post }) => {
         </StyledPostHeader>
         <PostTitle title={post.title} />
         <PostParagraph text={post.textLead} />
-        <PostForwardArrow />
+        {/* <PostForwardArrow /> */}
       </StyledContent>
     </StyledPostPreview>
   )

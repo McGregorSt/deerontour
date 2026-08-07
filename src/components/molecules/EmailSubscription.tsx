@@ -7,18 +7,23 @@ const StyledEmailSubscription = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* align-self: center; */
+  & > p {
+    color: #d4d1ba;
+  }
 `
 
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
+  width: 30rem;
 `
 
 const EmailSubscription: React.FC<{ title: string; date: string }> = ({ title, date }) => {
   return (
     <StyledEmailSubscription>
-      <p>Chcesz być na bieżąco? Subskrybuj!</p>
+      <p>Stay updated – Subscribe!</p>
       <StyledForm>
         <EmailInput />
         <SendButton />

@@ -6,15 +6,17 @@ import Header from '../atoms/Header'
 import { fetchPosts } from '../../support/api'
 
 const StyledHeader = styled.div`
-  padding: 0 1.5rem;
+  /* padding: 0 1.5rem; */
 `
 
 const StyledWrapper = styled.div`
   padding-top: 5rem;
   width: 100%;
-
+  margin-left: 5rem;
+  
   @media (max-width: 768px) {
     padding-top: 2.5rem;
+    margin-left: 1rem;
   }
 `
 
@@ -22,21 +24,22 @@ const StyledRecentPosts = styled.div`
   padding: 2rem 1.5rem 3rem;
   display: flex;
   flex-direction: row;
-  gap: 1.5rem;
+  gap: 3rem;
   justify-content: flex-start;
   overflow-x: auto;
   white-space: nowrap;
   align-items: stretch;
-
+  
   &::-webkit-scrollbar {
     display: none;
   }
-
+  
   @media (max-width: 768px) {
     padding: 1rem 1rem 2rem;
     flex-direction: row;
     white-space: nowrap;
     overflow-x: auto;
+    gap: 2rem;
   }
 `
 const RecentPosts = () => {

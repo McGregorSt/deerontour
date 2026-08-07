@@ -4,12 +4,13 @@ import styled from 'styled-components'
 const StyledEmailInput = styled.input`
   padding: 12px 20px;
   width: 100%;
-  max-width: 300px;
+  max-width: 360px;
   font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
 
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
   color: #000;
 
   backdrop-filter: blur(12px);
@@ -31,7 +32,7 @@ const StyledEmailInput = styled.input`
 `
 
 const EmailInput: React.FC = () => {
-  return <StyledEmailInput />
+  return <StyledEmailInput placeholder="Your email..." />
 }
 
 export default EmailInput

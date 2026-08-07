@@ -7,11 +7,11 @@ interface LogoProps {
 }
 
 const StyledLogo = styled.div<{ $large: boolean }>`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 40px;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+  /* font-size: 40px; */
   scale: ${({ $large }) => ($large ? '0.7' : '0.3')};
 
   @media (max-width: 768px) {

@@ -10,7 +10,7 @@ const StyledMenubar = styled.div`
   margin-top: -10vh;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   position: fixed;
   z-index: 996;
@@ -22,23 +22,26 @@ const StyledMenubar = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
   padding: 0 1.5rem;
 
+  
   @media (max-width: 768px) {
-    height: auto;
+    /* height: auto; */
     height: 10vh;
+    margin-top: -10vh;
+
     padding: 0.75rem 1rem;
     margin-top: 0;
   }
-`
+  `
 
 const StyledMenuButtons = styled.div`
   display: flex;
   align-items: center;
   overflow: visible;
   gap: 0.5rem;
-
+  
   & > * {
     text-decoration: none;
-    color: #47463a;
+    color: #a5a183;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     border-radius: 999px;
@@ -47,7 +50,7 @@ const StyledMenuButtons = styled.div`
     align-items: center;
     justify-content: center;
   }
-
+  
   @media (max-width: 768px) {
     display: none;
   }
@@ -80,6 +83,8 @@ const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   left: 0;
   right: 0;
   margin-top: 0px;
+  /* margin-top: -10vh; */
+
   /* border-radius: 20px; */
   padding: 2rem;
   transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0)' : 'translateY(-8px)')};
