@@ -11,8 +11,8 @@ import PostSubtitle from '../atoms/Post/PostSubtitle'
 
 const StyledPostHeader = styled.div``
 const StyledPostCard = styled.div`
-  min-height: 36rem;
-  width: min(16vw, 280px);
+  min-height: 38rem;
+  width: min(18vw, 380px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -38,7 +38,7 @@ const StyledPostCard = styled.div`
   cursor: pointer;
 
   &:hover {
-    opacity: 90%;
+    opacity: 97%;
   }
 
   ${StyledPostHeader} {
@@ -74,11 +74,13 @@ const StyledPostCardPhoto = styled.div`
 const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
   const navigate = useNavigate()
 
+  const [mouseEnter, setMouseEnter] = React.useState(false)
+
   const handleClick = (e: React.MouseEvent) => {
     navigate(`/tours/details/${post.country.toLowerCase()}`)
   }
   return (
-    <StyledPostCard onClick={(e) => handleClick(e)}>
+    <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={() => setMouseEnter(!mouseEnter)} >
       <StyledPostCardPhoto>
         <PostCardPhoto imgSrc={post.postGallery || []} />
       </StyledPostCardPhoto>
@@ -94,9 +96,10 @@ const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
         <PostParagraph
           text={post.textLead}
           hidden={true}
+          
         />
       </StyledContent>
-      <PostForwardArrow />
+      <PostForwardArrow mouseEnter={mouseEnter}/>
     </StyledPostCard>
   )
 }

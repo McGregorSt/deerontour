@@ -10,7 +10,7 @@ const StyledPostParagraph = styled.div<{ hidden?: boolean }>`
     css`
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 4;
+      -webkit-line-clamp: 6;
       overflow: hidden;
       text-overflow: ellipsis;
       word-wrap: break-word;
