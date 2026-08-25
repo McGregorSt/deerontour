@@ -17,15 +17,24 @@ const StyledPostCard = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   background-color: #fff;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px -8px;
-  border-radius: 20px;
+  /* box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px -8px; */
+  /* border-radius: 20px; */
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: rgba(57, 56, 56, 0.1) 0px 20px 36px -20px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  z-index: 990;
+  
+  &:hover {
+    z-index: 990;
+    box-shadow: rgba(57, 56, 56, 0.5) 0px 20px 36px -20px;
+    transform: translateY(-2px);
+  }
 
   * {
     background-color: #fff;
-    border-radius: 20px 20px 0 0;
+    /* border-radius: 20px 20px 0 0; */
   }
   * > span {
     background-color: #fff;
@@ -36,10 +45,6 @@ const StyledPostCard = styled.div`
   }
 
   cursor: pointer;
-
-  &:hover {
-    opacity: 97%;
-  }
 
   ${StyledPostHeader} {
     font-size: 24px;
@@ -80,7 +85,8 @@ const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
     navigate(`/tours/details/${post.country.toLowerCase()}`)
   }
   return (
-    <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={() => setMouseEnter(!mouseEnter)} >
+    <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={(e) => setMouseEnter(true)} onMouseLeave={(e) => setMouseEnter(false)} >
+    {/* <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={() => setMouseEnter(!mouseEnter)} > */}
       <StyledPostCardPhoto>
         <PostCardPhoto imgSrc={post.postGallery || []} />
       </StyledPostCardPhoto>

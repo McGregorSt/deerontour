@@ -7,18 +7,26 @@ interface LogoProps {
 }
 
 const StyledLogo = styled.div<{ $large: boolean }>`
-  /* display: flex; */
-  /* flex-direction: row; */
-  /* justify-content: space-between; */
-  /* align-items: center; */
-  /* font-size: 40px; */
-  scale: ${({ $large }) => ($large ? '0.7' : '0.3')};
+  /* display: block; */
+  width: ${({ $large }) => ($large ? '36rem' : '18rem')};
+  height: ${({ $large }) => ($large ? '12rem' : '7rem')};
+  margin: 0;
+  padding: 0;
+  background-image: url('/assets/logo4.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* scale: ${({ $large }) => ($large ? '0.9' : '0.9')}; */
 
   @media (max-width: 768px) {
+    width: 8rem;
+    height: 2.5rem;
     scale: 0.4;
   }
 
   @media (max-width: 480px) {
+    width: 7rem;
+    height: 2.2rem;
     scale: 0.6;
   }
 `
@@ -30,10 +38,10 @@ const Logo: React.FC<LogoProps> = ({ large }) => {
         key='1'
         to='/'
       >
-        <img
+        {/* <img
           src='/assets/logo4.png'
           alt='logo'
-        />
+        /> */}
       </Link>
     </StyledLogo>
   )

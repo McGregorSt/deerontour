@@ -7,7 +7,7 @@ import { IPost } from '../../support/types'
 import Header from '../atoms/Header'
 import { useLocation } from 'react-router-dom'
 import Continents from '../molecules/Continents'
-
+import WorldMap from '../molecules/WorldMap'
 
 const StyledToursHomepage = styled.div`
   padding: 0 15%;
@@ -23,21 +23,41 @@ const StyledToursHomepage = styled.div`
     display: none; /* Chrome, Safari */
   }
 `
+const StyledHeader = styled.div`
+  /* padding: 0 1.5rem; */
+`
+const StyledWrapper = styled.div`
+  padding-top: 5rem;
+  width: 90vw;
+  margin-left: 5vw;
+  /* margin-right: 5vw; */
+
+  @media (max-width: 768px) {
+    padding-top: 2.5rem;
+    margin-left: 1rem;
+  }
+`
+
 const StyledRecentPosts = styled.div`
-  padding: 0 15%;
-  grid-gap: 3vw;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  /* grid-template-rows: repeat(3, 1fr); */
-  justify-content: center;
+
+  padding: 2rem 0rem 3rem 0rem;
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  justify-content: flex-start;
   overflow-x: auto;
   white-space: nowrap;
-  /* overflow: no; */
-  padding-bottom: 3vw;
-  padding-top: 3vw;
 
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem 1rem 2rem;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow-x: auto;
+    gap: 2rem;
   }
 `
 interface ITours {
@@ -70,12 +90,19 @@ const Tours = () => {
 
   return (
     <UserPage>
-      <Header content='By Continents:' />
-      <StyledRecentPosts>
-        <>
-          <Continents continents={['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Australia', 'Antarctica']} />
-        </>
-      </StyledRecentPosts>
+      <>
+        <StyledWrapper>
+          <StyledHeader>
+            <Header content='By Continents:' />
+          </StyledHeader>
+          <StyledRecentPosts>
+            <Continents
+              continents={['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Australia', 'Antarctica']}
+            />
+            {/* <WorldMap  /> */}
+          </StyledRecentPosts>
+        </StyledWrapper>
+      </>
     </UserPage>
 
     // <UserPage>

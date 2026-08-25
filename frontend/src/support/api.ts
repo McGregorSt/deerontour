@@ -57,3 +57,47 @@ export const fetchPostByCountry = async (country: string): Promise<IPost | null>
 
   return null
 }
+
+export const fetchPostsByContinent = async (continent: string): Promise<IPost | null> => {
+  const data = await getJson<{ post?: IPost | null }>(`/blog/tours/continent/${continent.toLowerCase()}`, { post: null })
+  if (data.post) {
+    return data.post
+  }
+
+  if (shouldUseMockFallback) {
+    return mockPosts.find((item) => item.continent.toLowerCase() === continent.toLowerCase()) || mockPosts[0] || null
+  }
+
+  return null
+}
+
+// Direct fetch that does NOT fall back to mock data. Throws on network or non-JSON responses.
+export const fetchPostsByContinentNoMock = async (continent: string): Promise<IPost[]> => {
+  const url = `${API_BASE_URL}/blog/tours/${continent.toLowerCase()}`
+  const response = await fetch(url, {
+    method: 'get',
+    headers: { Accept: 'application/json' },
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`)
+  }
+
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    throw new Error('Non-JSON response')
+  }
+
+  const data = await response.json()
+
+  // API may return { posts: IPost[] } or an array directly
+  if (Array.isArray(data.posts)) {
+    return data.posts
+  }
+
+  if (Array.isArray(data)) {
+    return data as IPost[]
+  }
+
+  return []
+}

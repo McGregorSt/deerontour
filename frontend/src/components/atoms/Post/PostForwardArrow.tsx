@@ -14,10 +14,7 @@ const StyledArrow = styled.div<{ mouseEnter: boolean }>`
   z-index: 5;
 
   transition: transform 150ms ease;
-
-  &:hover {
-    transform: ${(props) => (props.mouseEnter ? 'translateX(5px)' : 'translateX(0)')};
-  }
+  transform: ${(props) => (props.mouseEnter ? 'translateX(5px)' : 'translateX(0)')};
 
   & > * {
     width: 30px;

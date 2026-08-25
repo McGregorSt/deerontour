@@ -11,7 +11,7 @@ const StyledHeader = styled.div`
 
 const StyledWrapper = styled.div`
   padding-top: 5rem;
-  width: 100%;
+  width:100%;
   margin-left: 5rem;
   
   @media (max-width: 768px) {
@@ -21,26 +21,28 @@ const StyledWrapper = styled.div`
 `
 
 const StyledRecentPosts = styled.div`
-  padding: 2rem 1.5rem 3rem;
-  display: flex;
-  flex-direction: row;
-  gap: 3rem;
-  justify-content: flex-start;
-  overflow-x: auto;
-  white-space: nowrap;
-  align-items: stretch;
-  
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  
-  @media (max-width: 768px) {
-    padding: 1rem 1rem 2rem;
+    padding: 2rem 1.5rem 3rem;
+    display: flex;
     flex-direction: row;
-    white-space: nowrap;
+    gap: 3rem;
+    justify-content: flex-start;
     overflow-x: auto;
-    gap: 2rem;
-  }
+    white-space: nowrap;
+    align-items: stretch;
+    /* width: 80%; */
+    margin-right: 5rem;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      padding: 1rem 1rem 2rem;
+      flex-direction: row;
+      white-space: nowrap;
+      overflow-x: auto;
+      gap: 2rem;
+    }
 `
 const RecentPosts = () => {
   // const location = useLocation()
