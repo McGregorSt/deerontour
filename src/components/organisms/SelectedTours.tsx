@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { useParams } from 'react-router'
 import PostCard from './PostCard'
 import { IPost } from '../../support/types'
+import { fetchPostsByContinentNoMock } from '../../support/api'
 import Header from '../atoms/Header'
 import PostPreview from './PostPreview'
 import UserPage from '../../template/UserPage'
@@ -10,9 +11,9 @@ import UserPage from '../../template/UserPage'
 
 const StyledWrapper = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  padding-top: 2vh;
+  padding: 2vh;
   grid-gap: 2vw;
   `
 const StyledSelectedTours = styled.div`
@@ -27,7 +28,7 @@ const StyledSelectedTours = styled.div`
 `
 
 const SelectedTours = () => {
-  const [postsData, setPostsData] = useState([])
+  const [postsData, setPostsData] = useState<IPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { continent } = useParams<{ continent: string }>()
@@ -38,16 +39,14 @@ const SelectedTours = () => {
       try {
         setLoading(true)
         setError(null)
-        const response = await fetch(`/blog/tours/${continent}`, {
-          method: 'get',
-        })
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        if (!continent) {
+          setError('No continent provided')
+          setPostsData([])
+          return
         }
-        const data = await response.json()
-        const { posts } = data
-        console.log('selected tours data:', posts)
-        setPostsData(posts || [])
+
+        const fetched = await fetchPostsByContinentNoMock(continent)
+        setPostsData(fetched || [])
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load tours'
         console.error('Error fetching tours:', errorMessage)
@@ -57,6 +56,7 @@ const SelectedTours = () => {
         setLoading(false)
       }
     }
+
     fetchPosts()
   }, [continent])
 
@@ -91,7 +91,7 @@ const SelectedTours = () => {
         <StyledWrapper>
           {postsData && postsData.length > 0 ? (
             postsData.map((post: IPost, index: number) => (
-              <PostPreview
+              <PostCard
                 key={index}
                 post={post}
               />

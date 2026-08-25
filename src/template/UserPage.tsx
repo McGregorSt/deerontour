@@ -6,9 +6,13 @@ import styled from 'styled-components'
 
 const StyledUserPage = styled.div`
   margin-top: 10vh;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 10vh);
 
   @media (max-width: 768px) {
     margin-top: 0;
+    min-height: 100vh;
   }
 `
 
@@ -20,8 +24,10 @@ const UserPage: React.FC<IProps> = ({ children }) => {
   return (
     <StyledUserPage>
       <MainTemplate>
-        <Menubar />
-        {children}
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <Menubar />
+          {children}
+        </div>
         <Footer />
       </MainTemplate>
     </StyledUserPage>

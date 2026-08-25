@@ -10,19 +10,18 @@ const StyledMenubar = styled.div`
   margin-top: -10vh;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   position: fixed;
-  z-index: 996;
+  z-index: 999;
   background: rgba(255, 255, 255, 0.386);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  /* text-align: center; */
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
-  padding: 0 1.5rem;
+  /* padding: 0 1.5rem; */
 
-  
   @media (max-width: 768px) {
     /* height: auto; */
     height: 10vh;
@@ -31,6 +30,14 @@ const StyledMenubar = styled.div`
     padding: 0.75rem 1rem;
     margin-top: 0;
   }
+`
+
+const StyledLogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border: 2px solid red; */
+  margin-left: 5vw;
   `
 
 const StyledMenuButtons = styled.div`
@@ -38,7 +45,8 @@ const StyledMenuButtons = styled.div`
   align-items: center;
   overflow: visible;
   gap: 0.5rem;
-  
+  margin-right: 5vw;
+
   & > * {
     text-decoration: none;
     color: #a5a183;
@@ -50,7 +58,7 @@ const StyledMenuButtons = styled.div`
     align-items: center;
     justify-content: center;
   }
-  
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -156,7 +164,9 @@ const Menubar = () => {
   return (
     <>
       <StyledMenubar>
-        <Logo large={false} />
+        <StyledLogo>
+            <Logo large={false} />
+        </StyledLogo>
         <StyledMenuButtons>
           {menuItems.map((item: { button: string; link: string }, index) => (
             <Link
