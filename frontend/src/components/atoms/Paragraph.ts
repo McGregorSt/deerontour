@@ -5,7 +5,7 @@ const Paragraph = styled.div`
     width: 50vw;
     padding: 20px 15px;
     text-align: justify;
-    font-size: 14px;
+    font-size: 0.875rem;
     text-indent: 50px;
     line-height: 1.5rem;
 `

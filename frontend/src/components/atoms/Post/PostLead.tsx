@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const StyledLead = styled.div`
-  font-size: 20px;
+  font-size: 1.25rem;
   align-self: flex-start;
   padding: 10px 20px;
   font-weight: 600;

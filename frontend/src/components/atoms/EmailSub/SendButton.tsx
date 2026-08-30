@@ -10,7 +10,7 @@ max-width: 10rem;
     color: #4e4d47;
 
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 20px;
@@ -25,10 +25,17 @@ max-width: 10rem;
     background: rgba(255, 255, 255, 0.35);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   }
+
+  @media (max-width: 1024px) {
+    padding: 4px 12px;
+    max-width: 30vw;
+    white-space: nowrap;
+    font-size: 0.7rem;
+  }
 `
 
 const SendButton: React.FC = () => {
-  return <StyledSendButton>Subskrybuj</StyledSendButton>
+  return <StyledSendButton>Inform Me</StyledSendButton>
 }
 
 export default SendButton
