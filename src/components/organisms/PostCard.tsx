@@ -47,7 +47,7 @@ const StyledPostCard = styled.div`
   cursor: pointer;
 
   ${StyledPostHeader} {
-    font-size: 24px;
+    font-size: 1.5rem;
     text-transform: uppercase;
   }
   @media (max-width: 768px) {

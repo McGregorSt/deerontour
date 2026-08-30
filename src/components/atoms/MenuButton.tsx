@@ -8,7 +8,7 @@ const StyledMenuButton = styled.div`
   border-radius: 20px;
   /* backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px); */
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 400;
   padding: 0.5rem 0.95rem;
   

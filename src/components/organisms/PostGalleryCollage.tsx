@@ -42,7 +42,7 @@ const Title = styled.div`
   bottom: 20px;
   left: 30px;
   font-family: 'Brush Script MT', cursive;
-  font-size: 36px;
+  font-size: 2.25rem;
   color: #d0e58b;
 `;
 
@@ -53,7 +53,7 @@ const Label = styled.div`
   transform: translate(-50%, -50%);
   background: white;
   padding: 6px 12px;
-  font-size: 16px;
+  font-size: 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 `;
 

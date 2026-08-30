@@ -28,7 +28,7 @@ const StyledPostPreview = styled.div`
   * > span {
     background-color: #fff;
     border-radius: 0;
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   img {
@@ -43,7 +43,7 @@ const StyledPostPreview = styled.div`
   }
 
   ${StyledPostHeader} {
-    font-size: 24px;
+    font-size: 1.5rem;
     text-transform: uppercase;
   }
 `

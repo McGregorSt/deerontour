@@ -38,6 +38,10 @@ const StyledLogo = styled.div`
   justify-content: center;
   /* border: 2px solid red; */
   margin-left: 5vw;
+  @media (max-width: 768px) {
+    margin-left: -20vw;
+    scale: 0.6;
+  }
   `
 
 const StyledMenuButtons = styled.div`

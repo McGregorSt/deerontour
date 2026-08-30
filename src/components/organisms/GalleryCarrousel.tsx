@@ -10,7 +10,7 @@ const StyledCarouselWrapper = styled.div`
   height: 100vh;
   background: #00000059;
   color: white;
-  font-size: 24px;
+  font-size: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
