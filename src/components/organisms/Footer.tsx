@@ -11,14 +11,21 @@ const StyledFooter = styled.div`
   display: flex;
   justify-content: space-around;
   flex-direction: row;
+  align-items: center;
   padding: 1vh 10vw;
-  gap: 2rem;
+  gap: 1rem;
 
-  & > :nth-child(1) {
-    margin-right: -5rem;
-    padding: 0;
+  & * {
+    /* border: 1px solid #3b3b34; */
   }
-
+  
+  & > :nth-child(1) {
+    margin-right: -10rem;
+  }
+  & > :nth-child(2) {
+    margin-right: -20rem;
+  }
+  
   @media (max-width: 1024px) {
     display: flex;
     flex-direction: column;
@@ -33,20 +40,24 @@ const StyledFooter = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
-    justify-content: flex-start;
     align-items: flex-start;
+    padding-top: 2rem;
     /* padding: 1.5rem 1rem; */
+    & > :nth-child(3) {
+      padding-top: 1rem;
+    }
   }
 `
 
 const StyledFooterButtons = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.35rem;
-  padding: 0 9rem 0 0;
+  padding: 0 0rem 0 0;
   & * {
     color: #3b3b34;
+    /* border: 1px solid #3b3b34; */
   }
 
   & > * {
@@ -77,8 +88,10 @@ const StyledFooterButtons = styled.div`
 
 const StyledLogo = styled.div`
   /* border: 1px solid #d4d1ba; */
+  scale: 1.6;
   padding: 0;
   @media (max-width: 768px) {
+    scale: 1;
     display: flex;
     justify-content: end;
   }

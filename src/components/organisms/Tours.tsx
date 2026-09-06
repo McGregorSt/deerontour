@@ -27,13 +27,14 @@ const StyledHeader = styled.div`
   /* padding: 0 1.5rem; */
 `
 const StyledWrapper = styled.div`
-  padding-top: 5rem;
   width: 90vw;
+  margin-top: 15vh;
   margin-left: 5vw;
   /* margin-right: 5vw; */
 
   @media (max-width: 768px) {
-    padding-top: 2.5rem;
+    /* padding-top: 2.5rem; */
+    margin-top: 13vh;
     margin-left: 1rem;
   }
 `
@@ -53,11 +54,16 @@ const StyledRecentPosts = styled.div`
   }
 
   @media (max-width: 768px) {
+    /* width: 95vw; */
     padding: 1rem 1rem 2rem;
     flex-direction: row;
     white-space: nowrap;
     overflow-x: auto;
     gap: 2rem;
+
+    & * {
+      font-size: 1.5rem;
+    }
   }
 `
 interface ITours {
@@ -93,7 +99,7 @@ const Tours = () => {
       <>
         <StyledWrapper>
           <StyledHeader>
-            <Header content='By Continents:' />
+            <Header content='Our tours by continents:' />
           </StyledHeader>
           <StyledRecentPosts>
             <Continents
