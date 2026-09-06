@@ -20,7 +20,7 @@ const StyledFooter = styled.div`
   }
   
   & > :nth-child(1) {
-    margin-right: -10rem;
+    margin-right: -15rem;
   }
   & > :nth-child(2) {
     margin-right: -20rem;
