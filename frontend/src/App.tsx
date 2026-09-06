@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AboutUs from './views/AboutUs'
 import Home from './views/Homepage'
 import Cooperation from './views/Cooperation'

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import PostCard from './PostCard'
 import { IPost } from '../../support/types'
 import { fetchPostsByContinentNoMock } from '../../support/api'
@@ -8,22 +8,39 @@ import Header from '../atoms/Header'
 import PostPreview from './PostPreview'
 import UserPage from '../../template/UserPage'
 
+const StyledSelectedTours = styled.div`
+  width: 100%;
+  padding: 10rem 0 3rem 5rem;
 
+  @media (max-width: 768px) {
+    padding: 7rem 0 2rem 2rem;
+  }
+`
 const StyledWrapper = styled.div`
+  width: 100%;
+  padding: 2rem 1.5rem 3rem;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  padding: 2vh;
-  grid-gap: 2vw;
-  `
-const StyledSelectedTours = styled.div`
+  gap: 3rem;
+  justify-content: flex-start;
   overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 3vw;
-  padding-top: 3vw;
+  align-items: stretch;
+  padding-right: 5rem;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem 1rem 2rem;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow-x: auto;
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
   }
 `
 
@@ -65,7 +82,7 @@ const SelectedTours = () => {
   if (error) {
     return (
       <StyledWrapper>
-        <Header content='Recent posts' />
+        <Header content={`Posts from ${continent}`} />
         <StyledSelectedTours>
           <div style={{ gridColumn: '1 / -1', color: 'red', textAlign: 'center' }}>Error loading tours: {error}</div>
         </StyledSelectedTours>
@@ -76,7 +93,7 @@ const SelectedTours = () => {
   if (loading) {
     return (
       <StyledWrapper>
-        <Header content='Recent posts' />
+        <Header content={`Posts from ${continent}`} />
         <StyledSelectedTours>
           <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>Loading tours...</div>
         </StyledSelectedTours>
@@ -87,7 +104,7 @@ const SelectedTours = () => {
   return (
     <UserPage>
       <StyledSelectedTours>
-      <Header content='Recent posts' />
+        <Header content={`Posts from ${continent}`} />
         <StyledWrapper>
           {postsData && postsData.length > 0 ? (
             postsData.map((post: IPost, index: number) => (

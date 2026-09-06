@@ -5,13 +5,13 @@ import Footer from '../components/organisms/Footer'
 import styled from 'styled-components'
 
 const StyledUserPage = styled.div`
-  margin-top: 10vh;
+  /* margin-top: 10vh; */
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 10vh);
 
   @media (max-width: 768px) {
-    margin-top: 0;
+    /* margin-top: 10vh; */
     min-height: 100vh;
   }
 `
