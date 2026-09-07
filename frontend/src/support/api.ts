@@ -71,6 +71,37 @@ export const fetchPostsByContinent = async (continent: string): Promise<IPost | 
   return null
 }
 
+export const fetchCountriesByContinent = async (continent: string): Promise<string[]> => {
+  const data = await getJson<{ continent?: string; countries?: string[] }>(`/blog/tours/countries/${continent.toLowerCase()}`, {
+    continent,
+    countries: [],
+  })
+
+  if (Array.isArray(data.countries) && data.countries.length) {
+    return data.countries.reduce<string[]>((result, country) => {
+      const value = String(country)
+      if (!result.includes(value)) {
+        result.push(value)
+      }
+      return result
+    }, [])
+  }
+
+  if (shouldUseMockFallback) {
+    return mockPosts
+      .filter((item) => item.continent.toLowerCase() === continent.toLowerCase())
+      .map((item) => item.country)
+      .reduce<string[]>((result, country) => {
+        if (!result.includes(country)) {
+          result.push(country)
+        }
+        return result
+      }, [])
+  }
+
+  return []
+}
+
 // Direct fetch that does NOT fall back to mock data. Throws on network or non-JSON responses.
 export const fetchPostsByContinentNoMock = async (continent: string): Promise<IPost[]> => {
   const url = `${API_BASE_URL}/blog/tours/${continent.toLowerCase()}`
