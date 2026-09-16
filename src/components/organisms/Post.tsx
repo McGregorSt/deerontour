@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { IPost } from '../../support/types'
@@ -14,26 +14,39 @@ const StyledPostWrapper = styled.div`
   min-height: 100vh;
 `
 
-const HeroSection = styled.header<{ $backgroundImage: string }>`
+const HeroSection = styled.header`
   position: relative;
   min-height: 88vh;
   display: flex;
   align-items: flex-end;
+  overflow: hidden;
+  padding: 1.5rem clamp(1rem, 3vw, 3rem) 2.5rem;
+  color: #f5f0ea;
+`
+
+const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: number }>`
+  position: absolute;
+  inset: -8% -4% -8% -4%;
   background-image: linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
     url(${(props) => props.$backgroundImage});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 1.5rem clamp(1rem, 3vw, 3rem) 2.5rem;
-  color: #f5f0ea;
+  transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0) scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
+  will-change: transform;
 `
 
-const HeroInner = styled.div`
+const HeroInner = styled.div<{ $scrollProgress: number }>`
+  position: relative;
+  z-index: 1;
   width: min(100%, 1280px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  transform: translate3d(0, ${(props) => props.$scrollProgress * 18}px, 0);
+  opacity: ${(props) => 1 - props.$scrollProgress * 0.38};
+  transition: opacity 0.15s ease-out;
 `
 
 const HeroKicker = styled.p`
@@ -296,6 +309,9 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const [loading, setLoading] = useState(!initialPost)
   const [error, setError] = useState<string | null>(null)
   const [activeSectionId, setActiveSectionId] = useState<string>('')
+  const [heroScrollProgress, setHeroScrollProgress] = useState(0)
+  const heroRef = useRef<HTMLElement | null>(null)
+  const [isSidebarSticky, setIsSidebarSticky] = useState(false)
 
   const postGalleryFlat = useMemo(() => {
     if (!post?.postGallery) {
@@ -337,6 +353,37 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
     fetchPost()
   }, [country, initialPost])
+
+  useEffect(() => {
+    const handleHeroScroll = () => {
+      if (!heroRef.current) {
+        return
+      }
+
+      const heroTop = heroRef.current.getBoundingClientRect().top
+      const heroHeight = heroRef.current.offsetHeight
+      const progress = Math.min(Math.max((-heroTop) / Math.max(heroHeight * 0.9, 1), 0), 1)
+
+      setHeroScrollProgress(progress)
+
+      // Toggle sidebar sticky only after the intro section is scrolled past
+      const overview = document.getElementById('overview')
+      if (overview) {
+        const overviewBottom = overview.getBoundingClientRect().bottom
+        // when bottom of overview is above 96px from top, enable sticky
+        setIsSidebarSticky(overviewBottom <= 96)
+      }
+    }
+
+    handleHeroScroll()
+    window.addEventListener('scroll', handleHeroScroll, { passive: true })
+    window.addEventListener('resize', handleHeroScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleHeroScroll)
+      window.removeEventListener('resize', handleHeroScroll)
+    }
+  }, [])
 
   useEffect(() => {
     if (!post || post.textParagraphs.length === 0) {
@@ -420,8 +467,9 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
   return (
     <StyledPostWrapper>
-      <HeroSection $backgroundImage={heroImage}>
-        <HeroInner>
+      <HeroSection ref={heroRef}>
+        <HeroBackground $backgroundImage={heroImage} $scrollProgress={heroScrollProgress} />
+        <HeroInner $scrollProgress={heroScrollProgress}>
           <HeroKicker>{post.country.toUpperCase()} / Travel story</HeroKicker>
           <HeroTitle>{post.title}</HeroTitle>
           <HeroMeta>
@@ -467,7 +515,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
         <ArticleLayout>
           <div>
-            <PostTableOfContents items={tocItems} activeId={activeSectionId} onSelect={handleSectionClick} />
+            <PostTableOfContents items={tocItems} activeId={activeSectionId} onSelect={handleSectionClick} sticky={isSidebarSticky} />
             <RoutePanel>
               <RouteTitle>Your route</RouteTitle>
               <RouteMap>
