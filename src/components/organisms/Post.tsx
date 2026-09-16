@@ -420,7 +420,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
   return (
     <StyledPostWrapper>
-      <HeroSection $backgroundImage={heroImage}>
+      <HeroSection $backgroundImage={post.postGallery?.[0]?.[0]?.src ?? 'asd'}>
         <HeroInner>
           <HeroKicker>{post.country.toUpperCase()} / Travel story</HeroKicker>
           <HeroTitle>{post.title}</HeroTitle>
