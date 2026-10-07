@@ -88,8 +88,8 @@ const Tours = () => {
   const isHomepage = location.pathname === '/'
 
   const sortedPostsByTime = [...postsData].sort((a: IPost, b: IPost) => {
-    const dateA = new Date(a.tourEnd).getTime()
-    const dateB = new Date(b.tourEnd).getTime()
+    const dateA = new Date(a.createdAt).getTime()
+    const dateB = new Date(b.createdAt).getTime()
 
     return dateB - dateA
   })

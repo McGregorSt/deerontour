@@ -12,6 +12,7 @@ const StyledPostWrapper = styled.div`
   flex-direction: column;
   background: #f8f6f1;
   min-height: 100vh;
+  margin-top: 9vh;
 `
 
 const HeroSection = styled.header`
@@ -30,6 +31,7 @@ const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: n
   background-image: linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
     url(${(props) => props.$backgroundImage});
   background-size: cover;
+  /* scale: .58; */
   background-position: center;
   background-repeat: no-repeat;
   transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0) scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
@@ -191,6 +193,10 @@ const ArticleLayout = styled.div`
   align-items: start;
   padding-top: 1rem;
 
+  & > div:first-child {
+    align-self: stretch;
+  }
+
   @media (max-width: 1080px) {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -311,7 +317,6 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const [activeSectionId, setActiveSectionId] = useState<string>('')
   const [heroScrollProgress, setHeroScrollProgress] = useState(0)
   const heroRef = useRef<HTMLElement | null>(null)
-  const [isSidebarSticky, setIsSidebarSticky] = useState(false)
 
   const postGalleryFlat = useMemo(() => {
     if (!post?.postGallery) {
@@ -365,14 +370,6 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
       const progress = Math.min(Math.max((-heroTop) / Math.max(heroHeight * 0.9, 1), 0), 1)
 
       setHeroScrollProgress(progress)
-
-      // Toggle sidebar sticky only after the intro section is scrolled past
-      const overview = document.getElementById('overview')
-      if (overview) {
-        const overviewBottom = overview.getBoundingClientRect().bottom
-        // when bottom of overview is above 96px from top, enable sticky
-        setIsSidebarSticky(overviewBottom <= 96)
-      }
     }
 
     handleHeroScroll()
@@ -468,14 +465,14 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   return (
     <StyledPostWrapper>
       <HeroSection ref={heroRef}>
-        <HeroBackground $backgroundImage={post.postGallery?.[0]?.[0]?.src ?? 'asd'} $scrollProgress={heroScrollProgress} />
+        <HeroBackground $backgroundImage={post.hero?.backgroundImage ?? 'asd'} $scrollProgress={heroScrollProgress} />
         <HeroInner $scrollProgress={heroScrollProgress}>
           <HeroKicker>{post.country.toUpperCase()} / Travel story</HeroKicker>
           <HeroTitle>{post.title}</HeroTitle>
           <HeroMeta>
             <span>{post.author}</span>
             <span>{new Date(post.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-            <span>8 min read</span>
+            <span>{post.hero?.readingTime ?? '8 min read'}</span>
           </HeroMeta>
           <HeroReadMore href="#overview">
             <HeroArrow>↓</HeroArrow>
@@ -486,37 +483,29 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
       <StyledPostContainer>
         <IntroSection id="overview">
-          <IntroMeta>08 min read</IntroMeta>
+          <IntroMeta>{post.hero?.readingTime ?? '8 min read'}</IntroMeta>
           <IntroLead>{post.textLead}</IntroLead>
           <LocationPills>
             <LocationPill>{post.country}</LocationPill>
             <LocationPill>{post.subtitle}</LocationPill>
             <LocationPill>{post.continent}</LocationPill>
           </LocationPills>
-          <SnapshotCard>
-            <SnapshotItem>
-              <SnapshotLabel>Duration</SnapshotLabel>
-              <SnapshotValue>7 days</SnapshotValue>
-            </SnapshotItem>
-            <SnapshotItem>
-              <SnapshotLabel>Distance</SnapshotLabel>
-              <SnapshotValue>1 240 km</SnapshotValue>
-            </SnapshotItem>
-            <SnapshotItem>
-              <SnapshotLabel>Mode</SnapshotLabel>
-              <SnapshotValue>Road trip</SnapshotValue>
-            </SnapshotItem>
-            <SnapshotItem>
-              <SnapshotLabel>Season</SnapshotLabel>
-              <SnapshotValue>September</SnapshotValue>
-            </SnapshotItem>
-          </SnapshotCard>
+          {post.metadata && post.metadata.length > 0 && (
+            <SnapshotCard>
+              {post.metadata.map((item) => (
+                <SnapshotItem key={item.label}>
+                  <SnapshotLabel>{item.label}</SnapshotLabel>
+                  <SnapshotValue>{item.value}</SnapshotValue>
+                </SnapshotItem>
+              ))}
+            </SnapshotCard>
+          )}
         </IntroSection>
 
         <ArticleLayout>
           <div>
-            <PostTableOfContents items={tocItems} activeId={activeSectionId} onSelect={handleSectionClick} sticky={isSidebarSticky} />
-            <RoutePanel>
+            <PostTableOfContents items={tocItems} activeId={activeSectionId} onSelect={handleSectionClick} />
+            {/* <RoutePanel>
               <RouteTitle>Your route</RouteTitle>
               <RouteMap>
                 <RouteLine />
@@ -533,7 +522,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
                   ))}
                 </RoutePointList>
               </RouteMap>
-            </RoutePanel>
+            </RoutePanel> */}
           </div>
 
           <ArticleContent>

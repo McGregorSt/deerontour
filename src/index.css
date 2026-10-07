@@ -1,5 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Darker+Grotesque:wght@300..900&family=Dosis:wght@200..800&family=Oswald:wght@200..700&family=Smooch+Sans:wght@100..900&display=swap');
 
+/* Podłączenie w CSS */
+@font-face {
+  font-family: 'whoa';
+  src: url('./fonts/whoa.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ams';
+  src: url('./fonts/amsterdam.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'aaaiight';
+  src: url('./fonts/aaaiight.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'underground';
+  src: url('./fonts/underground.ttf') format('truetype');
+  font-weight: 200;
+  font-display: swap;
+}
+
 html {
   scrollbar-width: none;
   -ms-overflow-style: none;

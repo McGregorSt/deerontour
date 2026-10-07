@@ -1,17 +1,18 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
-const StyledToc = styled.aside<{ $sticky?: boolean }>`
+const StyledToc = styled.aside`
   width: min(100%, 260px);
   background: rgba(250, 248, 243, 0.76);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(38, 38, 38, 0.12);
   padding: 1.2rem 1rem 1rem;
-  border-radius: 18px;
+  /* border-radius: 18px; */
   box-shadow: 0 18px 45px rgba(16, 24, 40, 0.04);
   align-self: start;
 
-  ${(p) => (p.$sticky ? `position: sticky; top: 2rem;` : `position: static;`) }
+  position: sticky;
+  top: calc(10vh + 1rem);
 
   @media (max-width: 1080px) {
     position: static !important;
@@ -111,10 +112,9 @@ interface PostTableOfContentsProps {
   items: TocItemData[]
   activeId?: string
   onSelect?: (id: string) => void
-  sticky?: boolean
 }
 
-const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, activeId, onSelect, sticky = false }) => {
+const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, activeId, onSelect }) => {
   const handleClick = (id: string) => {
     if (onSelect) {
       onSelect(id)
@@ -134,7 +134,7 @@ const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, active
   }
 
   return (
-    <StyledToc $sticky={sticky}>
+    <StyledToc>
       <TocTitle>On this page</TocTitle>
       <TocList>
         {items.map((item, index) => (

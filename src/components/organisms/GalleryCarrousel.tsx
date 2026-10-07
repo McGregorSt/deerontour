@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import MoveBtn from '../atoms/MoveBtn'
 import { IImage } from './PostGallery'
@@ -16,6 +16,7 @@ const StyledCarouselWrapper = styled.div`
   justify-content: center;
   backdrop-filter: blur(85px);
   align-items: center;
+  touch-action: pan-y;
   &::before {
     content: '';
     position: absolute;
@@ -54,12 +55,38 @@ const GalleryCarousel: React.FC<{
   setGalleryCarousel: () => void
 }> = ({ src, startPicIndex, images, setGalleryCarousel }) => {
   const [nextPictureIndex, setNextPictureIndex] = useState(startPicIndex)
+  const touchStartX = useRef<number | null>(null)
 
   const [lastPicture, setLastPicture] = useState(false)
   const [firstPicture, setFirstPicture] = useState(false)
 
   const handleState = (next: boolean) => {
-    next ? setNextPictureIndex(nextPictureIndex + 1) : setNextPictureIndex(nextPictureIndex - 1)
+    setNextPictureIndex((currentIndex) =>
+      Math.max(0, Math.min(images.length - 1, currentIndex + (next ? 1 : -1))),
+    )
+  }
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLImageElement>) => {
+    touchStartX.current = event.touches[0].clientX
+  }
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLImageElement>) => {
+    if (touchStartX.current === null) {
+      return
+    }
+
+    const distance = event.changedTouches[0].clientX - touchStartX.current
+    touchStartX.current = null
+
+    if (Math.abs(distance) >= 50) {
+      handleState(distance < 0)
+    }
+  }
+
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      setGalleryCarousel()
+    }
   }
 
   const handleKeyDown = useCallback(
@@ -130,14 +157,14 @@ const GalleryCarousel: React.FC<{
   }
 
   return (
-    <StyledLargePicBackgorund src={images[nextPictureIndex].src}>
-      <StyledCarouselWrapper>
+    <StyledLargePicBackgorund src={images[nextPictureIndex].src} onClick={handleBackdropClick}>
+      <StyledCarouselWrapper onClick={handleBackdropClick}>
         <>{displayButtons(firstPicture, lastPicture)}</>
         <CloseButton setGalleryCarousel={setGalleryCarousel} />
         <LargePic
           src={images[nextPictureIndex].src}
-          largePic={true}
-          setGalleryCarousel={setGalleryCarousel}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         />
       </StyledCarouselWrapper>
     </StyledLargePicBackgorund>

@@ -8,8 +8,8 @@ interface IProps {
 }
 
 const StyledMoveBtn = styled.div<{ next: boolean }>`
-  width: 90px;
-  height: 90px;
+  width: 5rem;
+  height: 5rem;
   position: fixed;
   display: flex;
   justify-content: center;
@@ -17,8 +17,17 @@ const StyledMoveBtn = styled.div<{ next: boolean }>`
   color: white;
   left: ${({ next }) => (next ? '' : '0')};
   right: ${({ next }) => (!next ? '' : '0')};
-  transform: ${({ next }) => (next ? '' : 'rotate(180deg)')};
+  transform: ${({ next }) => (next ? 'translateX(0)' : 'rotate(180deg) translateX(0)')};
+  transition: transform 0.2s ease;
   z-index: 995;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  &:hover {
+    transform: ${({ next }) => (next ? 'translateX(0.5rem)' : 'rotate(180deg) translateX(0.5rem)')};
+  }
 `
 
 const MoveBtn: React.FC<{
