@@ -36,4 +36,10 @@ export interface IPost {
   
   // Opcjonalne pole, które dodaliśmy
   modifiedAt?: string | null;
+
+  metadata?: { label: string; value: string }[];
+  hero?: {
+    backgroundImage: string;
+    readingTime: string;
+  };
 }

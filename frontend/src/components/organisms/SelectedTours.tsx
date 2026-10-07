@@ -161,6 +161,13 @@ const SelectedTours = () => {
     ? postsData
     : postsData.filter((post) => activeCountries.includes(post.country.toLowerCase()))
 
+  const sortedPostsByTime = [...filteredPosts].sort((a: IPost, b: IPost) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+  
+      return dateB - dateA
+    })
+
   if (error) {
     return (
       <StyledWrapper>
@@ -219,7 +226,7 @@ const SelectedTours = () => {
         <Header content={`Posts from ${continent}`} />
         <StyledWrapper>
           {filteredPosts && filteredPosts.length > 0 ? (
-            filteredPosts.map((post: IPost, index: number) => (
+            sortedPostsByTime.map((post: IPost, index: number) => (
               <PostCard
                 key={index}
                 post={post}

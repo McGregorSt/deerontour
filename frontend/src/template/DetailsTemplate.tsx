@@ -24,7 +24,7 @@ const DetailsTemplate: React.FC<{ post: IPost | null }> = ({ post }) => {
           <StyledDetailsWrapper>
             <Post post={post} />
             <>
-              <Link to='/tours'>go back</Link>
+              {/* <Link to='/tours'>{`<--`}</Link> */}
             </>
           </StyledDetailsWrapper>
         </UserPage>

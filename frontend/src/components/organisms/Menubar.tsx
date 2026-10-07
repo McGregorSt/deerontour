@@ -6,20 +6,23 @@ import Logo from '../molecules/Logo'
 
 const StyledMenubar = styled.div`
   width: 100vw;
-  height: 10vh;
+  height: 11vh;
   /* margin-top: -10vh; */
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   position: fixed;
-  z-index: 999;
+  z-index: 997;
   background: rgba(255, 255, 255, 0.386);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   /* text-align: center; */
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
+  font-family: 'aaaiight', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.3rem;
   /* padding: 0 1.5rem; */
 
   @media (max-width: 768px) {
@@ -119,6 +122,9 @@ const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   backdrop-filter: blur(20px);
   text-align: center;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
+  font-family: 'aaaiight', sans-serif;
+  font-size: 0.7rem;
+
 
   & > * {
     text-decoration: none;
