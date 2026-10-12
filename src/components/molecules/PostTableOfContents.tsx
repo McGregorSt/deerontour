@@ -1,5 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledToc = styled.aside`
   width: min(100%, 260px);
@@ -115,6 +116,7 @@ interface PostTableOfContentsProps {
 }
 
 const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, activeId, onSelect }) => {
+  const { t } = useI18n()
   const handleClick = (id: string) => {
     if (onSelect) {
       onSelect(id)
@@ -135,7 +137,7 @@ const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, active
 
   return (
     <StyledToc>
-      <TocTitle>On this page</TocTitle>
+      <TocTitle>{t('post.onThisPage')}</TocTitle>
       <TocList>
         {items.map((item, index) => (
           <TocItem key={item.id}>

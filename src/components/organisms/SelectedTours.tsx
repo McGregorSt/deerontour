@@ -3,10 +3,12 @@ import styled from 'styled-components'
 import { useParams } from 'react-router-dom'
 import PostCard from './PostCard'
 import { IPost } from '../../support/types'
-import { fetchCountriesByContinent, fetchPostsByContinentNoMock } from '../../support/api'
+import { fetchCountriesByContinent, fetchPostsByContinentNoMock, ICountryOption } from '../../support/api'
 import countryCodeMap from '../../shared/countryCodeMap'
 import Header from '../atoms/Header'
 import UserPage from '../../template/UserPage'
+import { useI18n } from '../../i18n/I18nContext'
+import { continentTranslationKeys } from '../../i18n/translations'
 
 const StyledSelectedTours = styled.div`
   width: 100%;
@@ -86,9 +88,10 @@ const StyledCountryChip = styled.button<{ $active: boolean }>`
 `
 
 const StyledCountryFlag = styled.img`
-  width: 52px;
-  height: 52px;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
+  border: 0.7rem solid rgba(255, 255, 255, 0.808);
   object-fit: cover;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   background: rgba(255, 255, 255, 0.45);
@@ -103,11 +106,15 @@ const StyledCountryLabel = styled.span`
 
 const SelectedTours = () => {
   const [postsData, setPostsData] = useState<IPost[]>([])
-  const [countries, setCountries] = useState<string[]>([])
+  const [countries, setCountries] = useState<ICountryOption[]>([])
   const [activeCountries, setActiveCountries] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { continent } = useParams<{ continent: string }>()
+  const { language, t } = useI18n()
+  const continentLabel = continent
+    ? t(continentTranslationKeys[continent.toLowerCase()] || 'tours.postsFrom')
+    : ''
 
   useEffect(() => {
     const fetchToursData = async () => {
@@ -123,8 +130,8 @@ const SelectedTours = () => {
         }
 
         const [fetchedPosts, fetchedCountries] = await Promise.all([
-          fetchPostsByContinentNoMock(continent),
-          fetchCountriesByContinent(continent),
+          fetchPostsByContinentNoMock(continent, language),
+          fetchCountriesByContinent(continent, language),
         ])
 
         setPostsData(fetchedPosts || [])
@@ -143,7 +150,7 @@ const SelectedTours = () => {
     }
 
     fetchToursData()
-  }, [continent])
+  }, [continent, language])
 
   const toggleCountry = (country: string) => {
     const normalizedCountry = country.toLowerCase()
@@ -170,23 +177,29 @@ const SelectedTours = () => {
 
   if (error) {
     return (
-      <StyledWrapper>
-        <Header content={`Posts from ${continent}`} />
-        <StyledSelectedTours>
-          <div style={{ gridColumn: '1 / -1', color: 'red', textAlign: 'center' }}>Error loading tours: {error}</div>
-        </StyledSelectedTours>
-      </StyledWrapper>
+      <UserPage>
+        <StyledWrapper>
+          <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
+          <StyledSelectedTours>
+            <div style={{ gridColumn: '1 / -1', color: 'red', textAlign: 'center' }}>
+              {t(error === 'No continent provided' ? 'tours.noContinent' : 'tours.loadError')} {error !== 'No continent provided' && error}
+            </div>
+          </StyledSelectedTours>
+        </StyledWrapper>
+      </UserPage>
     )
   }
 
   if (loading) {
     return (
-      <StyledWrapper>
-        <Header content={`Posts from ${continent}`} />
-        <StyledSelectedTours>
-          <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>Loading tours...</div>
-        </StyledSelectedTours>
-      </StyledWrapper>
+      <UserPage>
+        <StyledWrapper>
+          <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
+          <StyledSelectedTours>
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>{t('tours.loading')}</div>
+          </StyledSelectedTours>
+        </StyledWrapper>
+      </UserPage>
     )
   }
 
@@ -194,36 +207,36 @@ const SelectedTours = () => {
     <UserPage>
       <StyledSelectedTours>
         <StyledCountriesSection>
-          <Header content={`Choose posts by Country `} />
+          <Header content={t('tours.chooseCountry')} />
           <StyledCountriesList>
             {countries.length > 0 ? (
               countries.map((country) => {
-                const normalizedCountry = country.toLowerCase()
+                const normalizedCountry = country.code.toLowerCase()
                 const isActive = activeCountries.includes(normalizedCountry)
 
                 return (
                   <StyledCountryChip
-                    key={country}
+                    key={country.code}
                     type='button'
                     $active={isActive}
                     aria-pressed={isActive}
-                    onClick={() => toggleCountry(country)}
+                    onClick={() => toggleCountry(String(country.code))}
                   >
                     <StyledCountryFlag
-                      src={getCountryFlagUrl(country)}
-                      alt={`${country} flag`}
+                      src={getCountryFlagUrl(country.code)}
+                      alt={`${t('tours.flag')} ${country.label}`}
                     />
-                    <StyledCountryLabel>{country}</StyledCountryLabel>
+                    <StyledCountryLabel>{country.label}</StyledCountryLabel>
                   </StyledCountryChip>
                 )
               })
             ) : (
-              <div style={{ color: '#5b594d' }}>No countries found for this continent.</div>
+              <div style={{ color: '#5b594d' }}>{t('tours.noCountries')}</div>
             )}
           </StyledCountriesList>
         </StyledCountriesSection>
 
-        <Header content={`Posts from ${continent}`} />
+        <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
         <StyledWrapper>
           {filteredPosts && filteredPosts.length > 0 ? (
             sortedPostsByTime.map((post: IPost, index: number) => (
@@ -234,7 +247,7 @@ const SelectedTours = () => {
             ))
           ) : (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-              {activeCountries.length > 0 ? 'No tours found for the selected countries.' : 'No tours found for this continent.'}
+              {activeCountries.length > 0 ? t('tours.noSelectedTours') : t('tours.noTours')}
             </div>
           )}
         </StyledWrapper>

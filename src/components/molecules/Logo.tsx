@@ -1,6 +1,7 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { useI18n } from '../../i18n/I18nContext'
 
 interface LogoProps {
   large: boolean
@@ -69,6 +70,7 @@ const StyledDesc = styled.div`
 `
 
 const Logo: React.FC<LogoProps> = ({ large }) => {
+  const { t } = useI18n()
   return (
     <StyledWrapper>
       <Link
@@ -78,7 +80,7 @@ const Logo: React.FC<LogoProps> = ({ large }) => {
         <StyledLogo $large={large}></StyledLogo>
         <StyledNameWrapper>
           <StyledName>Deer On Tour</StyledName>
-          <StyledDesc>travel blog</StyledDesc>
+          <StyledDesc>{t('brand.tagline')}</StyledDesc>
         </StyledNameWrapper>
       </Link>
     </StyledWrapper>

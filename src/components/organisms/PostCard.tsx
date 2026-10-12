@@ -8,6 +8,7 @@ import { IPost } from '../../support/types'
 import PostTitle from '../atoms/Post/PostTitle'
 import PostForwardArrow from '../atoms/Post/PostForwardArrow'
 import PostSubtitle from '../atoms/Post/PostSubtitle'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledPostHeader = styled.div``
 const StyledPostCard = styled.div`
@@ -78,6 +79,7 @@ const StyledPostCardPhoto = styled.div`
 
 const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
   const navigate = useNavigate()
+  const { language } = useI18n()
 
   const [mouseEnter, setMouseEnter] = React.useState(false)
 
@@ -94,7 +96,7 @@ const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
         <StyledPostHeader>
           <PostHeader
             author={post.author}
-            date={post.createdAt.toString().split('T')[0]} // Wyodrębnienie daty z formatu ISO
+            date={new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB')}
           />
         </StyledPostHeader>
         <PostTitle title={post.title} />

@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+For the EN/PL UI and translated-post API contract, see [docs/i18n-api.md](docs/i18n-api.md).
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

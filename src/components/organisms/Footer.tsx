@@ -4,6 +4,8 @@ import MenuButton from '../atoms/MenuButton'
 import { Link } from 'react-router-dom'
 import Logo from '../molecules/Logo'
 import EmailSubscription from '../molecules/EmailSubscription'
+import { useI18n } from '../../i18n/I18nContext'
+import { TranslationKey } from '../../i18n/translations'
 
 const StyledFooter = styled.div`
   background-color: #827f6a;
@@ -97,30 +99,32 @@ const StyledLogo = styled.div`
   }
 `
 
-const menuItems = [
+const menuItems: { button: TranslationKey; link: string }[] = [
   {
-    button: 'home',
+    button: 'nav.home',
     link: '/',
   },
   {
-    button: 'tours',
+    button: 'nav.tours',
     link: '/tours',
   },
   {
-    button: 'cooperation',
+    button: 'nav.cooperation',
     link: '/cooperation',
   },
   {
-    button: 'contact',
+    button: 'nav.contact',
     link: '/contact',
   },
   {
-    button: 'about us',
+    button: 'nav.about',
     link: '/about-us',
   },
 ]
 
 const Footer = () => {
+  const { t } = useI18n()
+
   return (
     <StyledFooter>
       <StyledLogo>
@@ -131,13 +135,13 @@ const Footer = () => {
         date='2025'
       />
       <StyledFooterButtons>
-        {menuItems.map((item: { button: string; link: string }, index) => (
+        {menuItems.map((item) => (
           <>
             <Link
-              key={index}
+              key={item.link}
               to={item.link}
             >
-              <MenuButton text={item.button} />
+              <MenuButton text={t(item.button)} />
             </Link>
             {/* <>|</> */}
           </>

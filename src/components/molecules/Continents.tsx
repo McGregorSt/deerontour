@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import Continent from '../atoms/Continent'
+import { useI18n } from '../../i18n/I18nContext'
+import { continentTranslationKeys } from '../../i18n/translations'
 
 const StyledContinents = styled.div`
   display: grid;
@@ -40,12 +42,22 @@ const getContinentImageSrc = (continent: string) => {
 }
 
 const Continents: React.FC<{ continents: string[] }> = ({ continents }) => {
+  const { t } = useI18n()
+
   return (
     <>
       <StyledContinents>
         {continents.map((continent, index) => (
           <div key={index}>
-            <Continent continent={continent} imageSrc={getContinentImageSrc(continent)} />
+            <Continent
+              continent={continent}
+              label={
+                continentTranslationKeys[continent.toLowerCase()]
+                  ? t(continentTranslationKeys[continent.toLowerCase()])
+                  : continent
+              }
+              imageSrc={getContinentImageSrc(continent)}
+            />
           </div>
         ))}
       </StyledContinents>

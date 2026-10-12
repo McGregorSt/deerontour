@@ -2,6 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import MapPoint from './MapPoint'
 import MapBackground from '../atoms/MapBackground'
+import { useI18n } from '../../i18n/I18nContext'
+import { TranslationKey } from '../../i18n/translations'
 
 const StyledWorldMap = styled.div`
   position: relative;
@@ -31,33 +33,44 @@ const StyledDiv = styled.div`
 `
 
 export interface PointMap {
-  country: string,
+  countryCode: string,
+  countryKey: TranslationKey,
   x: string,
   y: string,
-  description: string,
+  descriptionKey: TranslationKey,
 }
 const mapPoints: PointMap[] = [
   {
-    country: 'Vietnam',
+    countryCode: 'vietnam',
+    countryKey: 'map.vietnam',
     x: '77.9%',
     y: '52.7%',
-    description: 'Viet Nam',
+    descriptionKey: 'map.vietnamDescription',
   },
   {
-    country: 'Iceland',
+    countryCode: 'iceland',
+    countryKey: 'map.iceland',
     x: '43.83%',
     y: '20.6%',
-    description: 'lorem llorem',
+    descriptionKey: 'map.icelandDescription',
   },
 ]
 
 
 const WorldMap: React.FC<{}> = () => {
+  const { t } = useI18n()
   return (
     <StyledWorldMap>
       <MapBackground>
       {mapPoints.map((point: PointMap, index: number) => (
-        <MapPoint key={`${point.country}-${index}`} country={point.country} x={point.x} y={point.y} description={point.description} />
+        <MapPoint
+          key={`${point.countryCode}-${index}`}
+          countryCode={point.countryCode}
+          country={t(point.countryKey)}
+          x={point.x}
+          y={point.y}
+          description={t(point.descriptionKey)}
+        />
       ))}
       </MapBackground>
     </StyledWorldMap>

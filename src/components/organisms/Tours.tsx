@@ -8,6 +8,8 @@ import Header from '../atoms/Header'
 import { useLocation } from 'react-router-dom'
 import Continents from '../molecules/Continents'
 import WorldMap from '../molecules/WorldMap'
+import { fetchPosts } from '../../support/api'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledToursHomepage = styled.div`
   padding: 0 15%;
@@ -72,18 +74,11 @@ interface ITours {
 
 const Tours = () => {
   const location = useLocation()
-  const [postsData, setPostsData] = useState([])
+  const { language, t } = useI18n()
+  const [postsData, setPostsData] = useState<IPost[]>([])
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch(`/blog/tours`, {
-        method: 'get',
-      })
-      const data = await response.json()
-      const { posts } = data
-      setPostsData(posts)
-    }
-    fetchPosts()
-  }, [])
+    fetchPosts(language).then(setPostsData).catch((error) => console.error('Error fetching tours:', error))
+  }, [language])
 
   const isHomepage = location.pathname === '/'
 
@@ -99,7 +94,7 @@ const Tours = () => {
       <>
         <StyledWrapper>
           <StyledHeader>
-            <Header content='Our tours by continents:' />
+            <Header content={t('tours.byContinents')} />
           </StyledHeader>
           <StyledRecentPosts>
             <Continents

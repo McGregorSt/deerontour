@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useI18n } from '../../../i18n/I18nContext'
 
 const StyledEmailInput = styled.input`
   padding: 12px 20px;
@@ -38,7 +39,8 @@ const StyledEmailInput = styled.input`
 `
 
 const EmailInput: React.FC = () => {
-  return <StyledEmailInput placeholder="Your email..." />
+  const { t } = useI18n()
+  return <StyledEmailInput placeholder={t('newsletter.emailPlaceholder')} />
 }
 
 export default EmailInput
