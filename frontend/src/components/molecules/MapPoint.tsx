@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { PointMap } from './WorldMap'
 
 interface MapPointProps {
+  countryCode: string
   country: string
   x: string
   y: string
@@ -105,7 +105,7 @@ const StyledPopup = styled('div')`
   }
 `
 
-const MapPoint: React.FC<PointMap> = ({ country, x, y, description }) => {
+const MapPoint: React.FC<MapPointProps> = ({ countryCode, country, x, y, description }) => {
   const navigate = useNavigate()
   const [displayPopup, setDisplayPopup] = useState<Boolean>(false)
 
@@ -113,7 +113,7 @@ const MapPoint: React.FC<PointMap> = ({ country, x, y, description }) => {
   const animationDelay = `${(Math.random() * 2.4).toFixed(2)}s`
 
   const handleCountryClick = () => {
-    navigate(`/tours/details/${country.toLowerCase()}`)
+    navigate(`/tours/details/${countryCode}`)
   }
 
   return (

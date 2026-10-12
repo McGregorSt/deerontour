@@ -6,28 +6,33 @@ import PostParagraph from '../atoms/Post/PostParagraph'
 import PostGallery from './PostGallery'
 import PostTableOfContents from '../molecules/PostTableOfContents'
 import { fetchPostByCountry } from '../../support/api'
+import { useI18n } from '../../i18n/I18nContext'
+import { continentTranslationKeys } from '../../i18n/translations'
 
 const StyledPostWrapper = styled.div`
   display: flex;
+  width: 100vw;
   flex-direction: column;
   background: #f8f6f1;
   min-height: 100vh;
-  margin-top: 9vh;
+  margin-top: 11vh;
 `
 
 const HeroSection = styled.header`
   position: relative;
-  min-height: 88vh;
+  min-height: 89vh;
+  /* width: 100%; */
   display: flex;
   align-items: flex-end;
   overflow: hidden;
+
   padding: 1.5rem clamp(1rem, 3vw, 3rem) 2.5rem;
   color: #f5f0ea;
 `
 
 const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: number }>`
   position: absolute;
-  inset: -8% -4% -8% -4%;
+  inset: -8% -4% -1% -4%;
   background-image: linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
     url(${(props) => props.$backgroundImage});
   background-size: cover;
@@ -222,8 +227,8 @@ const ArticleHeader = styled.header`
 `
 
 const SectionNumber = styled.span`
-  font-size: 0.76rem;
-  letter-spacing: 0.18em;
+  font-size: 0.86rem;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: rgba(25, 27, 29, 0.55);
   font-weight: 700;
@@ -234,7 +239,7 @@ const SectionTitle = styled.h2`
   margin: 0;
   font-size: clamp(2.15rem, 3vw, 3.25rem);
   line-height: 0.96;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.035em;
   font-family: 'Darker Grotesque', sans-serif;
   font-weight: 700;
   color: #1a1b1d;
@@ -311,6 +316,7 @@ const StyledPost = styled.div`
 
 const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const { country } = useParams<{ country: string }>()
+  const { language, t } = useI18n()
   const [post, setPost] = useState<IPost | null>(initialPost || null)
   const [loading, setLoading] = useState(!initialPost)
   const [error, setError] = useState<string | null>(null)
@@ -331,11 +337,14 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
   useEffect(() => {
     if (initialPost) {
+      setPost(initialPost)
+      setLoading(false)
+      setError(null)
       return
     }
 
     if (!country) {
-      setError('No country provided')
+      setError(t('post.noCountry'))
       setLoading(false)
       return
     }
@@ -344,7 +353,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
       try {
         setLoading(true)
         setError(null)
-        const fetchedPost = await fetchPostByCountry(country || '')
+        const fetchedPost = await fetchPostByCountry(country || '', language)
         setPost(fetchedPost)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load post'
@@ -357,7 +366,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
     }
 
     fetchPost()
-  }, [country, initialPost])
+  }, [country, initialPost, language])
 
   useEffect(() => {
     const handleHeroScroll = () => {
@@ -419,7 +428,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   if (error) {
     return (
       <StyledPost>
-        <div style={{ color: 'red', textAlign: 'center' }}>Error loading post: {error}</div>
+        <div style={{ color: 'red', textAlign: 'center' }}>{t('post.loadError')} {error}</div>
       </StyledPost>
     )
   }
@@ -427,7 +436,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   if (loading) {
     return (
       <StyledPost>
-        <div style={{ textAlign: 'center' }}>Loading post...</div>
+        <div style={{ textAlign: 'center' }}>{t('post.loading')}</div>
       </StyledPost>
     )
   }
@@ -435,7 +444,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   if (!post) {
     return (
       <StyledPost>
-        <div style={{ textAlign: 'center' }}>Post not found</div>
+        <div style={{ textAlign: 'center' }}>{t('post.notFound')}</div>
       </StyledPost>
     )
   }
@@ -461,34 +470,36 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
     label: item.title,
     index,
   }))
+  const continentKey = continentTranslationKeys[post.continent.toLowerCase()]
+  const continentLabel = continentKey ? t(continentKey) : post.continent
 
   return (
     <StyledPostWrapper>
       <HeroSection ref={heroRef}>
         <HeroBackground $backgroundImage={post.hero?.backgroundImage ?? 'asd'} $scrollProgress={heroScrollProgress} />
         <HeroInner $scrollProgress={heroScrollProgress}>
-          <HeroKicker>{post.country.toUpperCase()} / Travel story</HeroKicker>
+          <HeroKicker>{(post.countryLabel || post.country).toUpperCase()} / {t('post.travelStory')}</HeroKicker>
           <HeroTitle>{post.title}</HeroTitle>
           <HeroMeta>
             <span>{post.author}</span>
-            <span>{new Date(post.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-            <span>{post.hero?.readingTime ?? '8 min read'}</span>
+            <span>{new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+            <span>{post.hero?.readingTime ?? t('post.readingTime')}</span>
           </HeroMeta>
           <HeroReadMore href="#overview">
             <HeroArrow>↓</HeroArrow>
-            <span>Read more</span>
+            <span>{t('post.readMore')}</span>
           </HeroReadMore>
         </HeroInner>
       </HeroSection>
 
       <StyledPostContainer>
         <IntroSection id="overview">
-          <IntroMeta>{post.hero?.readingTime ?? '8 min read'}</IntroMeta>
+          <IntroMeta>{post.hero?.readingTime ?? t('post.readingTime')}</IntroMeta>
           <IntroLead>{post.textLead}</IntroLead>
           <LocationPills>
-            <LocationPill>{post.country}</LocationPill>
+            <LocationPill>{post.countryLabel || post.country}</LocationPill>
             <LocationPill>{post.subtitle}</LocationPill>
-            <LocationPill>{post.continent}</LocationPill>
+            <LocationPill>{continentLabel}</LocationPill>
           </LocationPills>
           {post.metadata && post.metadata.length > 0 && (
             <SnapshotCard>

@@ -4,6 +4,7 @@ import PostCard from './PostCard'
 import { IPost } from '../../support/types'
 import Header from '../atoms/Header'
 import { fetchPosts } from '../../support/api'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledHeader = styled.div`
   /* padding: 0 1.5rem; */
@@ -30,7 +31,7 @@ const StyledRecentPosts = styled.div`
     white-space: nowrap;
     align-items: stretch;
     /* width: 80%; */
-    margin-right: 5rem;
+    margin-right: 1rem;
     
     &::-webkit-scrollbar {
       display: none;
@@ -41,20 +42,21 @@ const StyledRecentPosts = styled.div`
       flex-direction: row;
       white-space: nowrap;
       overflow-x: auto;
-      gap: 2rem;
+      gap: 1rem;
     }
 `
 const RecentPosts = () => {
+  const { language, t } = useI18n()
   // const location = useLocation()
   const [postsData, setPostsData] = useState<IPost[]>([])
   useEffect(() => {
     const loadPosts = async () => {
-      const posts = await fetchPosts()
+      const posts = await fetchPosts(language)
       setPostsData(posts)
     }
 
     loadPosts()
-  }, [])
+  }, [language])
   // const isHomepage = location.pathname === '/'
 
   const sortedPostsByTime = [...postsData].sort((a: IPost, b: IPost) => {
@@ -69,7 +71,7 @@ const RecentPosts = () => {
       {/* {isHomepage ? ( */}
       <StyledWrapper>
         <StyledHeader>
-          <Header content='Recent posts' />
+          <Header content={t('home.recentPosts')} />
         </StyledHeader>
         {/* <StyledPosts> */}
         <StyledRecentPosts>

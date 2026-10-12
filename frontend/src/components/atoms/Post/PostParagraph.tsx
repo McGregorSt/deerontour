@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 const StyledPostParagraph = styled.div<{ hidden?: boolean }>`
   height: 100%;
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   padding: 5px 20px;
   ${(props) =>
     props.hidden &&

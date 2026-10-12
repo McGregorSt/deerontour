@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useI18n } from '../../../i18n/I18nContext'
 
 const StyledSendButton = styled.button`
 max-width: 10rem;
@@ -35,7 +36,8 @@ max-width: 10rem;
 `
 
 const SendButton: React.FC = () => {
-  return <StyledSendButton>Inform Me</StyledSendButton>
+  const { t } = useI18n()
+  return <StyledSendButton>{t('newsletter.submit')}</StyledSendButton>
 }
 
 export default SendButton

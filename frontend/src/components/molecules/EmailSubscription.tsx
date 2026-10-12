@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import SendButton from '../atoms/EmailSub/SendButton'
 import EmailInput from '../atoms/EmailSub/EmailInput'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledEmailSubscription = styled.div`
   display: flex;
@@ -39,9 +40,10 @@ const StyledForm = styled.form`
 `
 
 const EmailSubscription: React.FC<{ title: string; date: string }> = ({ title, date }) => {
+  const { t } = useI18n()
   return (
     <StyledEmailSubscription>
-      <span>Stay updated – Subscribe!</span>
+      <span>{t('newsletter.title')}</span>
       <StyledForm>
         <EmailInput />
         <SendButton />

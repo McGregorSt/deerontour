@@ -1,3 +1,23 @@
+import { Language } from '../i18n/translations'
+
+export interface IPostParagraph {
+  paragraphLead: string
+  paragraphText: string[]
+}
+
+export interface IPostTranslation {
+  title: string
+  subtitle: string
+  textLead: string
+  textParagraphs: IPostParagraph[]
+  countryLabel?: string
+  metadata?: { label: string; value: string }[]
+  hero?: {
+    backgroundImage: string
+    readingTime: string
+  }
+}
+
 export interface IPost {
   // W Postgresie używamy 'id' zamiast '_id'
   id: string; 
@@ -5,6 +25,7 @@ export interface IPost {
   title: string;
   subtitle: string;
   country: string;
+  countryLabel?: string;
   continent: string;
   
   // Sequelize zwraca daty jako obiekty Date
@@ -15,7 +36,9 @@ export interface IPost {
   textLead: string;
   
   // Tablica stringów (typ TEXT[] w Postgresie)
-  textParagraphs: { paragraphLead: string; paragraphText: string[] }[];
+  textParagraphs: IPostParagraph[];
+  language?: Language;
+  translations?: Partial<Record<Language, IPostTranslation>>;
   
   // Tablica źródeł obrazków otrzymana z backendu
   postGallery?: { src: string }[][]; // Może być tablicą obiektów lub tablicą tablic stringów
@@ -43,3 +66,10 @@ export interface IPost {
     readingTime: string;
   };
 }
+
+export type IPostApiTranslation = IPostTranslation & { language: Language }
+
+export type IPostApiPayload = Omit<Partial<IPost>, 'translations'> &
+  Pick<IPost, 'country' | 'continent'> & {
+    translations?: Partial<Record<Language, IPostTranslation>> | IPostApiTranslation[]
+  }

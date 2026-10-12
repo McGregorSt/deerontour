@@ -32,7 +32,7 @@ const StyledContinentImage = styled.div<{ $imageSrc: string }>`
   margin-right: 1rem;
 `
 
-const Continent: React.FC<{ continent: string, imageSrc: string }> = ({ continent, imageSrc }) => {
+const Continent: React.FC<{ continent: string, label?: string, imageSrc: string }> = ({ continent, label, imageSrc }) => {
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -43,7 +43,7 @@ const Continent: React.FC<{ continent: string, imageSrc: string }> = ({ continen
   return (
     <StyledContinent onClick={handleClick}>
       <StyledContinentImage $imageSrc={imageSrc} />
-      {continent}
+      {label || continent}
     </StyledContinent>
   )
 }

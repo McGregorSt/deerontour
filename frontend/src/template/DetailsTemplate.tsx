@@ -6,7 +6,6 @@ import { IPost } from '../support/types'
 import Gallery from '../components/organisms/PostGallery'
 import styled from 'styled-components'
 import Paragraph from '../components/atoms/Paragraph'
-import UserPage from './UserPage'
 
 
 const StyledDetailsWrapper = styled.div`
@@ -20,14 +19,12 @@ const DetailsTemplate: React.FC<{ post: IPost | null }> = ({ post }) => {
   return (
     <>
       {post && (
-        <UserPage>
-          <StyledDetailsWrapper>
-            <Post post={post} />
-            <>
-              {/* <Link to='/tours'>{`<--`}</Link> */}
-            </>
-          </StyledDetailsWrapper>
-        </UserPage>
+        <StyledDetailsWrapper>
+          <Post post={post} />
+          <>
+            {/* <Link to='/tours'>{`<--`}</Link> */}
+          </>
+        </StyledDetailsWrapper>
       )}
     </>
   )

@@ -8,12 +8,14 @@ import Contact from './views/Contact'
 import DetailsView from './views/Tour'
 import Tours from './components/organisms/Tours'
 import SelectedTours from './components/organisms/SelectedTours'
+import { I18nProvider } from './i18n/I18nContext'
 
 const App = () => {
   return (
-    <div className='App'>
-      <BrowserRouter basename='/'>
-        <Routes>
+    <I18nProvider>
+      <div className='App'>
+        <BrowserRouter basename='/'>
+          <Routes>
           <Route
             path='/'
             element={<Home />}
@@ -46,9 +48,10 @@ const App = () => {
             path='/about-us'
             element={<AboutUs />}
           />
-        </Routes>
-      </BrowserRouter>
-    </div>
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </I18nProvider>
   )
 }
 

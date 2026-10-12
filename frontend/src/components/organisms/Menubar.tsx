@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import MenuButton from '../atoms/MenuButton'
 import { Link } from 'react-router-dom'
 import Logo from '../molecules/Logo'
+import { useI18n } from '../../i18n/I18nContext'
+import { TranslationKey } from '../../i18n/translations'
 
 const StyledMenubar = styled.div`
   width: 100vw;
@@ -21,8 +23,13 @@ const StyledMenubar = styled.div`
   /* text-align: center; */
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
   font-family: 'aaaiight', sans-serif;
-  font-size: 1.4rem;
-  letter-spacing: 0.3rem;
+  /* font-family: 'Darker Grotesque', sans-serif; */
+  /* font-family:
+  apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+  'Helvetica Neue', sans-serif; */
+  font-weight: 200;
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
   /* padding: 0 1.5rem; */
 
   @media (max-width: 768px) {
@@ -102,6 +109,20 @@ const StyledMobileMenuToggle = styled.button`
   }
 `
 
+const StyledLanguageSelect = styled.select`
+  min-width: 3.5rem;
+  min-height: 44px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(58, 58, 55, 0.28);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  color: #3a3a37;
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+`
+
 const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   display: none;
   flex-direction: column;
@@ -139,31 +160,32 @@ const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
   }
 `
 
-const menuItems = [
+const menuItems: { button: TranslationKey; link: string }[] = [
   {
-    button: 'home',
+    button: 'nav.home',
     link: '/',
   },
   {
-    button: 'tours',
+    button: 'nav.tours',
     link: '/tours',
   },
   {
-    button: 'cooperation',
+    button: 'nav.cooperation',
     link: '/cooperation',
   },
   {
-    button: 'contact',
+    button: 'nav.contact',
     link: '/contact',
   },
   {
-    button: 'about us',
+    button: 'nav.about',
     link: '/about-us',
   },
 ]
 
 const Menubar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { language, setLanguage, t } = useI18n()
 
   return (
     <>
@@ -172,18 +194,26 @@ const Menubar = () => {
             <Logo large={false} />
         </StyledLogo>
         <StyledMenuButtons>
-          {menuItems.map((item: { button: string; link: string }, index) => (
+          {menuItems.map((item) => (
             <Link
-              key={index}
+              key={item.link}
               to={item.link}
             >
-              <MenuButton text={item.button} />
+              <MenuButton text={t(item.button)} />
             </Link>
           ))}
+        <StyledLanguageSelect
+          aria-label={t('language.label')}
+          value={language}
+          onChange={(event) => setLanguage(event.target.value as 'EN' | 'PL')}
+        >
+          <option value='EN'>EN</option>
+          <option value='PL'>PL</option>
+        </StyledLanguageSelect>
         </StyledMenuButtons>
         <StyledMobileMenuToggle
           type='button'
-          aria-label='Open navigation menu'
+          aria-label={isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           aria-expanded={isMobileMenuOpen}
           aria-controls='mobile-navigation-menu'
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
@@ -195,13 +225,13 @@ const Menubar = () => {
         id='mobile-navigation-menu'
         $isOpen={isMobileMenuOpen}
       >
-        {menuItems.map((item: { button: string; link: string }, index) => (
+        {menuItems.map((item) => (
           <StyledMenuLink
-            key={index}
+            key={item.link}
             to={item.link}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <MenuButton text={item.button} />
+            <MenuButton text={t(item.button)} />
           </StyledMenuLink>
         ))}
       </StyledMobileMenu>
