@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { IPost } from '../../support/types'
 import PostParagraph from '../atoms/Post/PostParagraph'
-import PostGallery from './PostGallery'
+import PostGallery, { IImage } from './PostGallery'
 import PostTableOfContents from '../molecules/PostTableOfContents'
 import { fetchPostByCountry } from '../../support/api'
 import { useI18n } from '../../i18n/I18nContext'
@@ -33,13 +33,15 @@ const HeroSection = styled.header`
 const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: number }>`
   position: absolute;
   inset: -8% -4% -1% -4%;
-  background-image: linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
+  background-image:
+    linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
     url(${(props) => props.$backgroundImage});
   background-size: cover;
   /* scale: .58; */
   background-position: center;
   background-repeat: no-repeat;
-  transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0) scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
+  transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0)
+    scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
   will-change: transform;
 `
 
@@ -166,8 +168,10 @@ const SnapshotCard = styled.div`
   padding: 1.2rem 1.3rem;
   border: 1px solid rgba(0, 0, 0, 0.09);
   background: rgba(255, 255, 255, 0.42);
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.03);
+  border-radius: 5px;
+  box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.01);
+  -webkit-box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.05);
 `
 
 const SnapshotItem = styled.div`
@@ -193,7 +197,7 @@ const SnapshotValue = styled.span`
 
 const ArticleLayout = styled.div`
   display: grid;
-  grid-template-columns: 260px minmax(0, 800px);
+  grid-template-columns: 320px minmax(0, 800px);
   gap: 5.5rem;
   align-items: start;
   padding-top: 1rem;
@@ -210,6 +214,73 @@ const ArticleLayout = styled.div`
 
 const ArticleContent = styled.div`
   width: 100%;
+`
+
+const ImageTextPair = styled.div<{ $reverse: boolean }>`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+  margin: 2rem 0 3rem;
+
+  & > :first-child {
+    order: ${({ $reverse }) => ($reverse ? 2 : 1)};
+  }
+
+  & > :last-child {
+    order: ${({ $reverse }) => ($reverse ? 1 : 2)};
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+
+    & > :first-child,
+    & > :last-child {
+      order: initial;
+    }
+  }
+`
+
+const PullQuote = styled.blockquote`
+  width: min(100%, 920px);
+  margin: 4rem auto;
+  padding: 0 0 0 1.5rem;
+  border-left: 2px solid rgba(25, 27, 29, 0.28);
+  color: #262723;
+  font-family: 'Darker Grotesque', sans-serif;
+  font-size: clamp(2rem, 3.2vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+
+  cite {
+    display: block;
+    margin-top: 1.2rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-style: normal;
+    font-weight: 500;
+  }
+`
+
+const ChapterDivider = styled.div`
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  width: min(100%, 800px);
+  margin: 3rem auto 4.5rem;
+  color: rgba(25, 27, 29, 0.58);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  &::after {
+    content: '';
+    height: 1px;
+    background: rgba(25, 27, 29, 0.18);
+  }
 `
 
 const StyledPostSection = styled.section`
@@ -314,6 +385,17 @@ const StyledPost = styled.div`
   width: 100%;
 `
 
+const getPullQuote = (text: string): string | null => {
+  const sentence = text.match(/[^.!?]+[.!?]/)?.[0].trim()
+  return sentence && sentence.length >= 100 ? sentence : null
+}
+
+const getGalleryWidthFactor = (imageCount: number, seed: number): number => {
+  const baseWidth = imageCount === 1 ? 1.5 : imageCount === 2 ? 1.3 : imageCount === 3 ? 1.2 : 1.08
+  const variation = (((seed * 7) % 5) - 2) * 0.045
+  return Math.max(1.05, baseWidth + variation)
+}
+
 const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const { country } = useParams<{ country: string }>()
   const { language, t } = useI18n()
@@ -324,16 +406,23 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const [heroScrollProgress, setHeroScrollProgress] = useState(0)
   const heroRef = useRef<HTMLElement | null>(null)
 
-  const postGalleryFlat = useMemo(() => {
-    if (!post?.postGallery) {
-      return [] as { src: string }[]
-    }
-
-    const flattened = post.postGallery.flat().filter(Boolean)
-    return flattened.map((image) => (typeof image === 'string' ? { src: image } : image))
+  const galleryGroups = useMemo(() => {
+    return (post?.postGallery ?? [])
+      .map((group) =>
+        group
+          .flat()
+          .filter(Boolean)
+          .map((image) => (typeof image === 'string' ? { src: image } : image)),
+      )
+      .filter((group) => group.length > 0)
   }, [post])
 
-  const heroImage = post?.imageUrl || postGalleryFlat[0]?.src || 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80'
+  const postGalleryFlat = useMemo(() => galleryGroups.flat(), [galleryGroups])
+
+  const heroImage =
+    post?.imageUrl ||
+    postGalleryFlat[0]?.src ||
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80'
 
   useEffect(() => {
     if (initialPost) {
@@ -376,7 +465,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
       const heroTop = heroRef.current.getBoundingClientRect().top
       const heroHeight = heroRef.current.offsetHeight
-      const progress = Math.min(Math.max((-heroTop) / Math.max(heroHeight * 0.9, 1), 0), 1)
+      const progress = Math.min(Math.max(-heroTop / Math.max(heroHeight * 0.9, 1), 0), 1)
 
       setHeroScrollProgress(progress)
     }
@@ -428,7 +517,9 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   if (error) {
     return (
       <StyledPost>
-        <div style={{ color: 'red', textAlign: 'center' }}>{t('post.loadError')} {error}</div>
+        <div style={{ color: 'red', textAlign: 'center' }}>
+          {t('post.loadError')} {error}
+        </div>
       </StyledPost>
     )
   }
@@ -470,22 +561,43 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
     label: item.title,
     index,
   }))
+  const galleryGroupsBySection = Array.from({ length: post.textParagraphs.length }, () => [] as IImage[][])
+  galleryGroups.forEach((group, groupIndex) => {
+    if (galleryGroupsBySection.length > 0) {
+      const sectionIndex = Math.min(
+        galleryGroupsBySection.length - 1,
+        Math.floor((groupIndex * galleryGroupsBySection.length) / galleryGroups.length),
+      )
+      galleryGroupsBySection[sectionIndex].push(group)
+    }
+  })
   const continentKey = continentTranslationKeys[post.continent.toLowerCase()]
   const continentLabel = continentKey ? t(continentKey) : post.continent
 
   return (
     <StyledPostWrapper>
       <HeroSection ref={heroRef}>
-        <HeroBackground $backgroundImage={post.hero?.backgroundImage ?? 'asd'} $scrollProgress={heroScrollProgress} />
+        <HeroBackground
+          $backgroundImage={post.hero?.backgroundImage ?? 'asd'}
+          $scrollProgress={heroScrollProgress}
+        />
         <HeroInner $scrollProgress={heroScrollProgress}>
-          <HeroKicker>{(post.countryLabel || post.country).toUpperCase()} / {t('post.travelStory')}</HeroKicker>
+          <HeroKicker>
+            {(post.countryLabel || post.country).toUpperCase()} / {t('post.travelStory')}
+          </HeroKicker>
           <HeroTitle>{post.title}</HeroTitle>
           <HeroMeta>
             <span>{post.author}</span>
-            <span>{new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+            <span>
+              {new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </span>
             <span>{post.hero?.readingTime ?? t('post.readingTime')}</span>
           </HeroMeta>
-          <HeroReadMore href="#overview">
+          <HeroReadMore href='#overview'>
             <HeroArrow>↓</HeroArrow>
             <span>{t('post.readMore')}</span>
           </HeroReadMore>
@@ -493,7 +605,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
       </HeroSection>
 
       <StyledPostContainer>
-        <IntroSection id="overview">
+        <IntroSection id='overview'>
           <IntroMeta>{post.hero?.readingTime ?? t('post.readingTime')}</IntroMeta>
           <IntroLead>{post.textLead}</IntroLead>
           <LocationPills>
@@ -515,7 +627,11 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
         <ArticleLayout>
           <div>
-            <PostTableOfContents items={tocItems} activeId={activeSectionId} onSelect={handleSectionClick} />
+            <PostTableOfContents
+              items={tocItems}
+              activeId={activeSectionId}
+              onSelect={handleSectionClick}
+            />
             {/* <RoutePanel>
               <RouteTitle>Your route</RouteTitle>
               <RouteMap>
@@ -539,21 +655,96 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
           <ArticleContent>
             {post.textParagraphs.map((paragraph, index) => {
               const sectionId = tocItems[index]?.id ?? `paragraph-${index}`
-              const sectionImages = postGalleryFlat.length > 0 && post.postGallery && Array.isArray(post.postGallery[index])
-                ? post.postGallery[index].filter(Boolean)
-                : postGalleryFlat
+              const sectionGroups = galleryGroupsBySection[index] ?? []
+              const textCount = Math.max(paragraph.paragraphText.length, 1)
+              const groupsByText = Array.from({ length: textCount }, () => [] as IImage[][])
+
+              sectionGroups.forEach((group, groupIndex) => {
+                const textIndex = Math.min(textCount - 1, Math.floor((groupIndex * textCount) / sectionGroups.length))
+                groupsByText[textIndex].push(group)
+              })
+
+              const pullQuote =
+                post.pullQuotes?.[Math.floor(index / 2)] || getPullQuote(paragraph.paragraphText.join(' '))
 
               return (
-                <StyledPostSection id={sectionId} key={sectionId}>
-                  <ArticleHeader>
-                    <SectionNumber>{String(index + 1).padStart(2, '0')}</SectionNumber>
-                    <SectionTitle>{paragraph.paragraphLead}</SectionTitle>
-                  </ArticleHeader>
-                  {paragraph.paragraphText.map((textPart: string, textIndex: number) => (
-                    <PostParagraph key={`${sectionId}-${textIndex}`} text={textPart} hidden={false} />
-                  ))}
-                  <PostGallery imagesToDisplay={sectionImages as { src: string }[]} imagesArr={postGalleryFlat} />
-                </StyledPostSection>
+                <React.Fragment key={sectionId}>
+                  <StyledPostSection id={sectionId}>
+                    <ArticleHeader>
+                      <SectionNumber>{String(index + 1).padStart(2, '0')}</SectionNumber>
+                      <SectionTitle>{paragraph.paragraphLead}</SectionTitle>
+                    </ArticleHeader>
+                    {paragraph.paragraphText.map((textPart: string, textIndex: number) => {
+                      const textImages = groupsByText[textIndex] ?? []
+                      const splitImage =
+                        textPart.length < 420 ? textImages.find((group) => group.length === 1) : undefined
+                      const remainingImages = splitImage
+                        ? textImages.filter((group) => group !== splitImage)
+                        : textImages
+
+                      return (
+                        <React.Fragment key={`${sectionId}-${textIndex}`}>
+                          {splitImage ? (
+                            <ImageTextPair $reverse={(index + textIndex) % 2 === 1}>
+                              <PostGallery
+                                imagesToDisplay={splitImage}
+                                imagesArr={postGalleryFlat}
+                                layout='split'
+                              />
+                              <PostParagraph
+                                text={textPart}
+                                hidden={false}
+                              />
+                            </ImageTextPair>
+                          ) : (
+                            <PostParagraph
+                              text={textPart}
+                              hidden={false}
+                            />
+                          )}
+                          {remainingImages.map((imageGroup, groupIndex) => (
+                            <PostGallery
+                              key={`${sectionId}-${textIndex}-gallery-${groupIndex}`}
+                              imagesToDisplay={imageGroup}
+                              imagesArr={postGalleryFlat}
+                              wide
+                              widthFactor={getGalleryWidthFactor(
+                                imageGroup.length,
+                                index * 11 + textIndex * 5 + groupIndex,
+                              )}
+                              offsetPercent={
+                                ((index * 11 + textIndex * 13 + groupIndex * 17 + post.country.length) % 13) - 6
+                              }
+                            />
+                          ))}
+                        </React.Fragment>
+                      )
+                    })}
+                    {paragraph.paragraphText.length === 0 &&
+                      sectionGroups.map((imageGroup, groupIndex) => (
+                        <PostGallery
+                          key={`${sectionId}-gallery-${groupIndex}`}
+                          imagesToDisplay={imageGroup}
+                          imagesArr={postGalleryFlat}
+                          wide
+                          widthFactor={getGalleryWidthFactor(imageGroup.length, index * 11 + groupIndex)}
+                          offsetPercent={((index * 11 + groupIndex * 17 + post.country.length) % 13) - 6}
+                        />
+                      ))}
+                  </StyledPostSection>
+                  {index % 2 === 1 && pullQuote && (
+                    <PullQuote>
+                      {pullQuote}
+                      <cite>{post.author}</cite>
+                    </PullQuote>
+                  )}
+                  {index < post.textParagraphs.length - 1 && (
+                    <ChapterDivider>
+                      <span>{String(index + 2).padStart(2, '0')}</span>
+                      <span>{post.textParagraphs[index + 1].paragraphLead}</span>
+                    </ChapterDivider>
+                  )}
+                </React.Fragment>
               )
             })}
           </ArticleContent>

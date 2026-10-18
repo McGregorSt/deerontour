@@ -18,15 +18,19 @@ const StyledPostCard = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   background-color: #fff;
-  /* box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px -8px; */
-  /* border-radius: 20px; */
+  /* box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 36px 8px; */
+  box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: rgba(57, 56, 56, 0.1) 0px 20px 36px -20px;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  /* box-shadow: rgba(57, 56, 56, 0.1) 0px 20px 36px -20px; */
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   z-index: 990;
-  
+
   &:hover {
     z-index: 990;
     box-shadow: rgba(57, 56, 56, 0.5) 0px 20px 36px -20px;
@@ -57,14 +61,12 @@ const StyledPostCard = styled.div`
   }
 `
 
-
 const StyledContent = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
   padding: 0 1rem 1rem;
 `
-
 
 const StyledPostCardPhoto = styled.div`
   & > * {
@@ -87,8 +89,12 @@ const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
     navigate(`/tours/details/${post.country.toLowerCase()}`)
   }
   return (
-    <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={(e) => setMouseEnter(true)} onMouseLeave={(e) => setMouseEnter(false)} >
-    {/* <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={() => setMouseEnter(!mouseEnter)} > */}
+    <StyledPostCard
+      onClick={(e) => handleClick(e)}
+      onMouseEnter={(e) => setMouseEnter(true)}
+      onMouseLeave={(e) => setMouseEnter(false)}
+    >
+      {/* <StyledPostCard onClick={(e) => handleClick(e)} onMouseEnter={() => setMouseEnter(!mouseEnter)} > */}
       <StyledPostCardPhoto>
         <PostCardPhoto imgSrc={post.postGallery || []} />
       </StyledPostCardPhoto>
@@ -104,10 +110,9 @@ const PostCard: React.FC<{ post: IPost }> = ({ post }) => {
         <PostParagraph
           text={post.textLead}
           hidden={true}
-          
         />
       </StyledContent>
-      <PostForwardArrow mouseEnter={mouseEnter}/>
+      <PostForwardArrow mouseEnter={mouseEnter} />
     </StyledPostCard>
   )
 }

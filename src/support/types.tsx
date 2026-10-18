@@ -12,6 +12,7 @@ export interface IPostTranslation {
   textParagraphs: IPostParagraph[]
   countryLabel?: string
   metadata?: { label: string; value: string }[]
+  pullQuotes?: string[]
   hero?: {
     backgroundImage: string
     readingTime: string
@@ -61,6 +62,7 @@ export interface IPost {
   modifiedAt?: string | null;
 
   metadata?: { label: string; value: string }[];
+  pullQuotes?: string[];
   hero?: {
     backgroundImage: string;
     readingTime: string;

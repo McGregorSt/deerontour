@@ -3,22 +3,24 @@ import styled, { css } from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
 
 const StyledToc = styled.aside`
-  width: min(100%, 260px);
+  width: min(100%, 320px);
   background: rgba(250, 248, 243, 0.76);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(38, 38, 38, 0.12);
-  padding: 1.2rem 1rem 1rem;
-  /* border-radius: 18px; */
-  box-shadow: 0 18px 45px rgba(16, 24, 40, 0.04);
+  padding: 1.2rem 3rem 1rem;
+  box-shadow: 0 18px 45px rgba(16, 24, 40, 0.05);
   align-self: start;
+  border-radius: 5px;
 
   position: sticky;
-  top: calc(10vh + 1rem);
+  top: calc(10vh + 2rem);
+  transform: translateX(max(-250px, calc(626px - 50vw)));
 
   @media (max-width: 1080px) {
     position: static !important;
     width: 100%;
     margin-bottom: 2rem;
+    transform: none;
   }
 `
 
@@ -41,6 +43,7 @@ const TocList = styled.ul`
 const TocItem = styled.li`
   position: relative;
   margin: 0;
+  padding-right: 0.5rem;
 `
 
 const activeItemStyles = css`

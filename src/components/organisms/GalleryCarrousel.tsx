@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import MoveBtn from '../atoms/MoveBtn'
 import { IImage } from './PostGallery'
@@ -156,7 +157,7 @@ const GalleryCarousel: React.FC<{
     }
   }
 
-  return (
+  return createPortal(
     <StyledLargePicBackgorund src={images[nextPictureIndex].src} onClick={handleBackdropClick}>
       <StyledCarouselWrapper onClick={handleBackdropClick}>
         <>{displayButtons(firstPicture, lastPicture)}</>
@@ -167,7 +168,8 @@ const GalleryCarousel: React.FC<{
           onTouchEnd={handleTouchEnd}
         />
       </StyledCarouselWrapper>
-    </StyledLargePicBackgorund>
+    </StyledLargePicBackgorund>,
+    document.body,
   )
 }
 
