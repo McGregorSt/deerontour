@@ -9,6 +9,7 @@ import DetailsView from './views/Tour'
 import Tours from './components/organisms/Tours'
 import SelectedTours from './components/organisms/SelectedTours'
 import { I18nProvider } from './i18n/I18nContext'
+import PostsByCountry from './views/PostsByCountry'
 
 const App = () => {
   return (
@@ -35,6 +36,10 @@ const App = () => {
           <Route
             path='/tours/details/:country'
             element={<DetailsView />}
+          />
+          <Route
+            path='/posts'
+            element={<PostsByCountry />}
           />
           <Route
             path='/cooperation'
