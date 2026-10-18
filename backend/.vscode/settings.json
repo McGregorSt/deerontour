@@ -7,6 +7,10 @@
         "/^node --check app\\.js; if \\(\\$\\?\\) \\{ node --check controllers/blog\\.js \\}; if \\(\\$\\?\\) \\{ node --check test/blog-controller\\.test\\.js \\}$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^node --check app\\.js; if \\(\\$\\?\\) \\{ node --check controllers/blog\\.js \\}; if \\(\\$\\?\\) \\{ node --check test/blog-controller\\.test\\.js \\}; if \\(\\$\\?\\) \\{ git --no-pager diff --check \\}$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

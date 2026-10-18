@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/blog', blogRoutes)
-app.get('/api/v1/posts', blogController.getPosts)
+app.get('/api/v1/posts', blogController.getPostByCountry)
 
 sequelize
   .sync()

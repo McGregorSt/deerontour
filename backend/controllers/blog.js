@@ -51,7 +51,7 @@ const isValidParagraphs = (paragraphs) =>
       paragraph.paragraphText.every((text) => typeof text === 'string'),
   )
 
-exports.getPosts = (req, res, next) => {
+const listPosts = (req, res) => {
   const language = getLanguage(req, res)
   if (!language) return
 
@@ -90,6 +90,9 @@ exports.getPosts = (req, res, next) => {
       res.status(500).json({ message: 'Błąd pobierania postów' })
     })
 }
+
+exports.getPosts = (req, res) => listPosts(req, res)
+exports.getPostByCountry = (req, res) => listPosts(req, res)
 
 exports.getPost = (req, res, next) => {
   const language = getLanguage(req, res)

@@ -23,7 +23,7 @@ const createResponse = () => ({
   },
 })
 
-test('getPosts filters country case-insensitively and sorts newest first', async () => {
+test('getPostByCountry filters country case-insensitively and sorts newest first', async () => {
   let query
   Post.findAll = (options) => {
     query = options
@@ -31,7 +31,7 @@ test('getPosts filters country case-insensitively and sorts newest first', async
   }
 
   const response = createResponse()
-  blogController.getPosts(
+  blogController.getPostByCountry(
     { query: { country: '  Vietnam  ' } },
     response,
     assert.fail,
@@ -46,7 +46,37 @@ test('getPosts filters country case-insensitively and sorts newest first', async
   assert.deepEqual(response.body, { posts: [] })
 })
 
-test('getPosts omits the country filter when country is not provided', async () => {
+test('getPostByCountry omits the country filter when country is not provided', async () => {
+  let query
+  Post.findAll = (options) => {
+    query = options
+    return Promise.resolve([])
+  }
+
+  const response = createResponse()
+  blogController.getPostByCountry({ query: {} }, response, assert.fail)
+
+  await new Promise((resolve) => setImmediate(resolve))
+
+  assert.equal(Object.hasOwn(query, 'where'), false)
+  assert.deepEqual(query.order, [['createdAt', 'DESC']])
+  assert.equal(response.statusCode, 200)
+})
+
+test('getPostByCountry rejects non-string or blank country values', () => {
+  const response = createResponse()
+
+  blogController.getPostByCountry(
+    { query: { country: ['Vietnam', 'Poland'] } },
+    response,
+    assert.fail,
+  )
+
+  assert.equal(response.statusCode, 400)
+  assert.equal(response.body.message, 'Parametr country musi być nazwą kraju')
+})
+
+test('getPosts remains available for the existing posts endpoint', async () => {
   let query
   Post.findAll = (options) => {
     query = options
@@ -58,16 +88,8 @@ test('getPosts omits the country filter when country is not provided', async () 
 
   await new Promise((resolve) => setImmediate(resolve))
 
+  assert.equal(typeof blogController.getPosts, 'function')
   assert.equal(Object.hasOwn(query, 'where'), false)
   assert.deepEqual(query.order, [['createdAt', 'DESC']])
   assert.equal(response.statusCode, 200)
-})
-
-test('getPosts rejects non-string or blank country values', () => {
-  const response = createResponse()
-
-  blogController.getPosts({ query: { country: ['Vietnam', 'Poland'] } }, response, assert.fail)
-
-  assert.equal(response.statusCode, 400)
-  assert.equal(response.body.message, 'Parametr country musi być nazwą kraju')
 })
