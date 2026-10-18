@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 interface MapPointProps {
   countryCode: string
+  countryName: string
   country: string
   x: string
   y: string
@@ -105,7 +106,7 @@ const StyledPopup = styled('div')`
   }
 `
 
-const MapPoint: React.FC<MapPointProps> = ({ countryCode, country, x, y, description }) => {
+const MapPoint: React.FC<MapPointProps> = ({ countryName, country, x, y, description }) => {
   const navigate = useNavigate()
   const [displayPopup, setDisplayPopup] = useState<Boolean>(false)
 
@@ -113,20 +114,22 @@ const MapPoint: React.FC<MapPointProps> = ({ countryCode, country, x, y, descrip
   const animationDelay = `${(Math.random() * 2.4).toFixed(2)}s`
 
   const handleCountryClick = () => {
-    navigate(`/tours/details/${countryCode}`)
+    navigate(`/posts?country=${encodeURIComponent(countryName)}`)
   }
 
   return (
     <StyledMapPoint
+      type='button'
       $x={x}
       $y={y}
       $animationDelay={animationDelay}
+      aria-label={countryName}
+      title={countryName}
+      onClick={handleCountryClick}
+      onMouseOver={() => setDisplayPopup(true)}
+      onMouseLeave={() => setDisplayPopup(false)}
     >
-      <span
-        onClick={handleCountryClick}
-        onMouseOver={() => setDisplayPopup(true)}
-        onMouseLeave={() => setDisplayPopup(false)}
-      />
+      <span />
       {displayPopup && (
         <StyledPopup>
           <h3 style={{ margin: '8px 0' }}>{country}</h3>

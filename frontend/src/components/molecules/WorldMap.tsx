@@ -34,6 +34,7 @@ const StyledDiv = styled.div`
 
 export interface PointMap {
   countryCode: string,
+  countryName: string,
   countryKey: TranslationKey,
   x: string,
   y: string,
@@ -42,6 +43,7 @@ export interface PointMap {
 const mapPoints: PointMap[] = [
   {
     countryCode: 'vietnam',
+    countryName: 'Vietnam',
     countryKey: 'map.vietnam',
     x: '77.9%',
     y: '52.7%',
@@ -49,6 +51,7 @@ const mapPoints: PointMap[] = [
   },
   {
     countryCode: 'iceland',
+    countryName: 'Iceland',
     countryKey: 'map.iceland',
     x: '43.83%',
     y: '20.6%',
@@ -66,6 +69,7 @@ const WorldMap: React.FC<{}> = () => {
         <MapPoint
           key={`${point.countryCode}-${index}`}
           countryCode={point.countryCode}
+          countryName={point.countryName}
           country={t(point.countryKey)}
           x={point.x}
           y={point.y}
