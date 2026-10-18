@@ -78,20 +78,24 @@ export const fetchPosts = async (language: Language = 'EN'): Promise<IPost[]> =>
 
 export const fetchPostsByCountry = async (country: string, language: Language = 'EN'): Promise<IPost[]> => {
   const query = new URLSearchParams({ country })
-  const fallbackPosts = mockPosts
-    .filter((post) => post.country.toLowerCase() === country.toLowerCase())
-    .map((post) => localizePost(post, language))
-  const data = await getJson<IPostApiPayload[] | { posts?: IPostApiPayload[] }>(
-    `/api/v1/posts?${query.toString()}`,
-    fallbackPosts,
-  )
-  const posts = Array.isArray(data) ? data : data.posts ?? []
+  const response = await fetch(`${API_BASE_URL}/api/v1/posts?${query.toString()}`, {
+    method: 'get',
+    headers: { Accept: 'application/json' },
+  })
 
-  if (posts.length > 0) {
-    return posts.map((post) => localizePost(post, language))
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`)
   }
 
-  return shouldUseMockFallback ? fallbackPosts : []
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    throw new Error('Non-JSON response')
+  }
+
+  const data = await response.json() as IPostApiPayload[] | { posts?: IPostApiPayload[] }
+  const posts = Array.isArray(data) ? data : data.posts ?? []
+
+  return posts.map((post) => localizePost(post, language))
 }
 
 export const fetchPostByCountry = async (country: string, language: Language = 'EN'): Promise<IPost | null> => {
