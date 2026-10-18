@@ -8,25 +8,34 @@ interface IProps {
 }
 
 const StyledMoveBtn = styled.div<{ next: boolean }>`
-  width: 5rem;
-  height: 5rem;
+  width: 3rem;
+  height: 3rem;
+  padding-left: 0.3rem;
   position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
-  left: ${({ next }) => (next ? '' : '0')};
-  right: ${({ next }) => (!next ? '' : '0')};
+  left: ${({ next }) => (next ? '' : '1rem')};
+  right: ${({ next }) => (!next ? '' : '1rem')};
   transform: ${({ next }) => (next ? 'translateX(0)' : 'rotate(180deg) translateX(0)')};
-  transition: transform 0.2s ease;
+  background-color: rgba(170, 170, 170, 0.2);
+  border-radius: 5px;
+  transition: transform 0.1s ease;
   z-index: 995;
+  cursor: pointer;
+
+  img {
+    scale: 0.6;
+    color: white;
+  }
 
   @media (max-width: 768px) {
     display: none;
   }
 
   &:hover {
-    transform: ${({ next }) => (next ? 'translateX(0.5rem)' : 'rotate(180deg) translateX(0.5rem)')};
+    transform: ${({ next }) => (next ? 'translateX(0.1rem)' : 'rotate(180deg) translateX(0.1rem)')};
+    background-color: rgba(170, 170, 170, 0.25);
   }
 `
 

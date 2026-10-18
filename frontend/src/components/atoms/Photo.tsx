@@ -45,6 +45,9 @@ const StyledPhoto = styled.div<{ src: string }>`
   background-position: center;
   min-height: 180px;
   width: 100%;
+  box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
 
   &:hover {
     transform: scale(1.005);
