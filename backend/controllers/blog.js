@@ -55,7 +55,31 @@ exports.getPosts = (req, res, next) => {
   const language = getLanguage(req, res)
   if (!language) return
 
-  Post.findAll({ include: [translationInclude(language)] })
+  const country = req.query.country
+  if (
+    country !== undefined &&
+    (typeof country !== 'string' || !country.trim())
+  ) {
+    return res.status(400).json({
+      message: 'Parametr country musi być nazwą kraju',
+    })
+  }
+
+  const filters =
+    country === undefined
+      ? {}
+      : {
+          where: sequelize.where(
+            sequelize.fn('LOWER', sequelize.col('country')),
+            country.trim().toLowerCase(),
+          ),
+        }
+
+  Post.findAll({
+    ...filters,
+    include: [translationInclude(language)],
+    order: [['createdAt', 'DESC']],
+  })
     .then((posts) => {
       res.status(200).json({
         posts: posts.map(serializePost),
@@ -98,6 +122,7 @@ exports.getPostsByContinent = (req, res, next) => {
   Post.findAll({
     where: { continent },
     include: [translationInclude(language)],
+    order: [['createdAt', 'DESC']],
   })
     .then((posts) => {
       res.status(200).json({
@@ -237,4 +262,3 @@ exports.createPost = (req, res, next) => {
       })
     })
 }
-
