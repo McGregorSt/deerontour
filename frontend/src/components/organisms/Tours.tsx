@@ -98,7 +98,7 @@ const Tours = () => {
           </StyledHeader>
           <StyledRecentPosts>
             <Continents
-              continents={['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Australia', 'Antarctica']}
+              continents={['North America', 'Europe', 'Asia', 'South America', 'Africa', 'Australia', 'Antarctica']}
             />
             {/* <WorldMap  /> */}
           </StyledRecentPosts>

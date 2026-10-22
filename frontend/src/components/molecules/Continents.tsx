@@ -8,22 +8,29 @@ const StyledContinents = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2rem 4rem;
-  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* width: 100%; */
+  /* align-self: center; */
   margin-top: 3vh;
   padding: 20px;
   /* width: 80%; */
   width: min(100%, 100vw);
-
+  
   @media (max-width: 1550px) {
+    /* display: grid; */
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   @media (max-width: 1024px) {
+    display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
-
+  
   @media (max-width: 768px) {
+    display: grid;
     grid-template-columns: 1fr;
-    padding: 1rem;
+    /* padding: 1rem; */
   }
 `
 

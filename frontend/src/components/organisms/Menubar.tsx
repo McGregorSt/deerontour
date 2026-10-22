@@ -1,241 +1,541 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
-import MenuButton from '../atoms/MenuButton'
-import { Link } from 'react-router-dom'
-import Logo from '../molecules/Logo'
 import { useI18n } from '../../i18n/I18nContext'
-import { TranslationKey } from '../../i18n/translations'
+import { Language, TranslationKey } from '../../i18n/translations'
+import Logo from '../molecules/Logo'
 
-const StyledMenubar = styled.div`
-  width: 100vw;
-  height: 11vh;
-  /* margin-top: -10vh; */
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boolean }>`
   position: fixed;
-  z-index: 997;
-  background: rgba(255, 255, 255, 0.386);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  /* text-align: center; */
-  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
-  font-family: 'aaaiight', sans-serif;
-  /* font-family: 'Darker Grotesque', sans-serif; */
-  /* font-family:
-  apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-  'Helvetica Neue', sans-serif; */
-  font-weight: 200;
-  font-size: 1.6rem;
-  letter-spacing: 0.1rem;
-  /* padding: 0 1.5rem; */
+  inset: ${({ $isScrolled }) => ($isScrolled ? '0.75rem 1.25rem auto' : '0 0 auto')};
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: ${({ $isScrolled }) => ($isScrolled ? 'calc(100% - 2.5rem)' : '100%')};
+  height: ${({ $isScrolled }) => ($isScrolled ? '5.5rem' : '6.75rem')};
+  border-radius: ${({ $isScrolled }) => ($isScrolled ? '12px' : '0')};
+  padding: 0 clamp(1.25rem, 5vw, 5rem);
+  background-color: ${({ $isScrolled, $mobileMenuOpen }) => {
+    if ($mobileMenuOpen) return 'rgba(248, 247, 243, 0.98)'
+    return $isScrolled ? 'rgba(250, 249, 246, 0.58)' : 'transparent'
+  }};
+  color: ${({ $isScrolled, $mobileMenuOpen }) => (
+    $isScrolled || $mobileMenuOpen ? '#262720' : '#fff'
+  )};
+  backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
+  -webkit-backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
+  box-shadow: ${({ $isScrolled }) => (
+    $isScrolled
+      ? '0 8px 28px rgba(35, 37, 26, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65)'
+      : 'none'
+  )};
+  border-bottom: ${({ $isScrolled }) => (
+    $isScrolled ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent'
+  )};
+  isolation: isolate;
+  font-family: 'Montserrat', sans-serif;
+  transition:
+    inset 300ms ease,
+    width 300ms ease,
+    height 300ms ease,
+    border-radius 300ms ease,
+    background-color 300ms ease,
+    color 300ms ease,
+    box-shadow 300ms ease,
+    backdrop-filter 300ms ease,
+    -webkit-backdrop-filter 300ms ease;
 
-  @media (max-width: 768px) {
-    /* height: auto; */
-    height: 10vh;
-    /* margin-top: -10vh; */
+  &::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(5, 8, 7, 0.38) 0%, rgba(5, 8, 7, 0.16) 68%, rgba(5, 8, 7, 0) 100%);
+    content: '';
+    opacity: ${({ $isScrolled, $mobileMenuOpen }) => ($isScrolled || $mobileMenuOpen ? 0 : 1)};
+    pointer-events: none;
+    transition: opacity 300ms ease;
+  }
 
-    padding: 0.75rem 1rem;
-    /* margin-top: 0; */
+  @media (max-width: 1024px) {
+    inset: ${({ $isScrolled }) => ($isScrolled ? '0.5rem 0.5rem auto' : '0 0 auto')};
+    width: ${({ $isScrolled }) => ($isScrolled ? 'calc(100% - 1rem)' : '100%')};
+    height: ${({ $isScrolled }) => ($isScrolled ? '4.25rem' : '5rem')};
+    min-height: 0;
+    flex-wrap: nowrap;
+    padding: 0 clamp(0.75rem, 3vw, 1.5rem);
+  }
+
+  @media (min-width: 1025px) and (max-width: 1100px) {
+    padding-inline: 2rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &::before {
+      transition: none;
+    }
   }
 `
 
-const StyledLogo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* border: 2px solid red; */
-  margin-left: 5vw;
-  @media (max-width: 768px) {
-    margin-left: -10vw;
-    scale: 0.6;
-  }
-  `
+const StyledBrand = styled.div`
+  position: relative;
+  z-index: 1003;
+  flex: 0 0 auto;
 
-const StyledMenuButtons = styled.div`
-  display: flex;
-  align-items: center;
-  overflow: visible;
-  gap: 0.5rem;
-  margin-right: 5vw;
-
-  & > * {
-    text-decoration: none;
-    color: #a5a183;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    border-radius: 999px;
-    min-height: 44px;
-    display: inline-flex;
+  & > div > a {
+    display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.35rem;
+    color: inherit;
   }
 
-  @media (max-width: 768px) {
-    display: none;
+  & > div > a > div:first-child {
+    width: 3.25rem;
+    height: 3.5rem;
+  }
+
+  & > div > a > div:last-child {
+    width: auto;
+  }
+
+  @media (max-width: 600px) {
+    & > div > a > div:first-child {
+      width: 2.7rem;
+      height: 3rem;
+    }
+
+    & > div > a > div:last-child > div:first-child {
+      font-size: 1.05rem;
+    }
+
+    & > div > a > div:last-child > div:last-child {
+      font-size: 0.48rem;
+    }
   }
 `
 
-const StyledMenuLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
+const StyledNav = styled.nav<{ $mobileMenuOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(2rem, 3vw, 2.75rem);
+  position: relative;
+  z-index: 1001;
+
+  @media (max-width: 1024px) {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 6rem 1.5rem 3rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: rgba(248, 247, 243, 0.98);
+    color: #262720;
+    opacity: ${({ $mobileMenuOpen }) => ($mobileMenuOpen ? 1 : 0)};
+    visibility: ${({ $mobileMenuOpen }) => ($mobileMenuOpen ? 'visible' : 'hidden')};
+    pointer-events: ${({ $mobileMenuOpen }) => ($mobileMenuOpen ? 'auto' : 'none')};
+    transform: ${({ $mobileMenuOpen }) => ($mobileMenuOpen ? 'translateY(0)' : 'translateY(-0.5rem)')};
+    transition:
+      opacity 280ms ease,
+      transform 280ms ease,
+      visibility 0s linear ${({ $mobileMenuOpen }) => ($mobileMenuOpen ? '0ms' : '280ms')};
+  }
+
+  @media (max-width: 600px) {
+    gap: 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`
+
+const StyledMenuLink = styled(NavLink)`
+  position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  min-height: 44px;
+  padding: 0.35rem 0;
+  color: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
 
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0.25rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    content: '';
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 280ms ease;
+  }
+
+  &:hover::after,
+  &[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 5px;
+  }
+
+  @media (max-width: 1024px) {
+    min-height: 48px;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    min-height: 48px;
+    font-size: clamp(1.2rem, 5vw, 1.6rem);
+    letter-spacing: 0.08em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      transition: none;
+    }
+  }
+`
+
+const StyledLanguagePicker = styled.div`
+  position: relative;
+  margin-left: 0.3rem;
+
+  @media (max-width: 1024px) {
+    margin: 0;
   }
 `
 
 const StyledMobileMenuToggle = styled.button`
+  position: relative;
+  z-index: 1003;
   display: none;
-  border: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
   background: transparent;
-  color: #3a3a37;
-  font-size: 1rem;
-  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+
+  @media (max-width: 1024px) {
+    display: inline-flex;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+`
+
+const StyledToggleIcon = styled.span<{ $isOpen: boolean }>`
+  position: relative;
+  display: block;
+  width: 21px;
+  height: 1px;
+  background: ${({ $isOpen }) => ($isOpen ? 'transparent' : 'currentColor')};
+  transition: background-color 250ms ease;
+
+  &::before,
+  &::after {
+    position: absolute;
+    left: 0;
+    width: 21px;
+    height: 1px;
+    background: currentColor;
+    content: '';
+    transition: transform 250ms ease;
+  }
+
+  &::before {
+    transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0) rotate(45deg)' : 'translateY(-6px)')};
+  }
+
+  &::after {
+    transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0) rotate(-45deg)' : 'translateY(6px)')};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &::before,
+    &::after {
+      transition: none;
+    }
+  }
+`
+
+const StyledLanguageToggle = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   min-width: 44px;
   min-height: 44px;
-  cursor: pointer;
-
-  @media (max-width: 768px) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-`
-
-const StyledLanguageSelect = styled.select`
-  min-width: 3.5rem;
-  min-height: 44px;
-  padding: 0.35rem 0.5rem;
-  border: 1px solid rgba(58, 58, 55, 0.28);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.35);
-  color: #3a3a37;
+  padding: 0.4rem 0.55rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   cursor: pointer;
+
+  &::after {
+    width: 0.38rem;
+    height: 0.38rem;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    content: '';
+    transform: rotate(45deg) translateY(-0.1rem);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
 `
 
-const StyledMobileMenu = styled.div<{ $isOpen: boolean }>`
-  display: none;
-  flex-direction: column;
-  justify-content: flex-start;
-  position: fixed;
-  top: 10vh;
-  left: 0;
+const StyledLanguageOptions = styled.div<{ $isOpen: boolean }>`
+  position: absolute;
+  top: calc(100% + 0.35rem);
   right: 0;
-  width: 100vw;
-  box-sizing: border-box;
-  padding: 1.5rem 4rem;
-  transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0)' : 'translateY(-8px)')};
-  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
-  pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
-  transition: all 0.2s ease;
-  z-index: 996;
-  background: rgba(255, 255, 255, 0.386);
-  backdrop-filter: blur(20px);
-  text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
-  font-family: 'aaaiight', sans-serif;
-  font-size: 0.7rem;
+  z-index: 1004;
+  display: ${({ $isOpen }) => ($isOpen ? 'grid' : 'none')};
+  min-width: 5rem;
+  padding: 0.35rem;
+  border: 1px solid rgba(38, 39, 32, 0.08);
+  background: #f8f7f3;
+  box-shadow: 0 8px 24px rgba(35, 37, 26, 0.12);
+  color: #262720;
 
-
-  & > * {
-    text-decoration: none;
-    color: #47463a;
-    cursor: pointer;
-    min-height: 44px;
-    display: inline-flex;
-  }
-
-  @media (max-width: 768px) {
-    display: flex;
+  @media (max-width: 1024px) {
+    right: 50%;
+    transform: translateX(50%);
   }
 `
 
-const menuItems: { button: TranslationKey; link: string }[] = [
-  {
-    button: 'nav.home',
-    link: '/',
-  },
-  {
-    button: 'nav.tours',
-    link: '/tours',
-  },
-  {
-    button: 'nav.cooperation',
-    link: '/cooperation',
-  },
-  {
-    button: 'nav.contact',
-    link: '/contact',
-  },
-  {
-    button: 'nav.about',
-    link: '/about-us',
-  },
+const StyledLanguageOption = styled.button`
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-align: center;
+  cursor: pointer;
+
+  &[aria-selected='true'],
+  &:hover {
+    background: rgba(38, 39, 32, 0.07);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+`
+
+const menuItems: { label: TranslationKey; path: string; end?: boolean }[] = [
+  { label: 'nav.home', path: '/', end: true },
+  { label: 'nav.tours', path: '/tours' },
+  { label: 'nav.cooperation', path: '/cooperation', end: true },
+  { label: 'nav.contact', path: '/contact', end: true },
+  { label: 'nav.about', path: '/about-us', end: true },
 ]
 
-const Menubar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+const LanguagePicker: React.FC = () => {
   const { language, setLanguage, t } = useI18n()
+  const [isOpen, setIsOpen] = useState(false)
+  const pickerRef = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !pickerRef.current?.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+        toggleRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen])
+
+  const chooseLanguage = (nextLanguage: Language) => {
+    setLanguage(nextLanguage)
+    setIsOpen(false)
+  }
 
   return (
-    <>
-      <StyledMenubar>
-        <StyledLogo>
-            <Logo large={false} />
-        </StyledLogo>
-        <StyledMenuButtons>
-          {menuItems.map((item) => (
-            <Link
-              key={item.link}
-              to={item.link}
-            >
-              <MenuButton text={t(item.button)} />
-            </Link>
-          ))}
-        <StyledLanguageSelect
-          aria-label={t('language.label')}
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as 'EN' | 'PL')}
-        >
-          <option value='EN'>EN</option>
-          <option value='PL'>PL</option>
-        </StyledLanguageSelect>
-        </StyledMenuButtons>
-        <StyledMobileMenuToggle
-          type='button'
-          aria-label={isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-          aria-expanded={isMobileMenuOpen}
-          aria-controls='mobile-navigation-menu'
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-        >
-          {isMobileMenuOpen ? '✕' : '☰'}
-        </StyledMobileMenuToggle>
-      </StyledMenubar>
-      <StyledMobileMenu
-        id='mobile-navigation-menu'
-        $isOpen={isMobileMenuOpen}
+    <StyledLanguagePicker ref={pickerRef}>
+      <StyledLanguageToggle
+        ref={toggleRef}
+        type='button'
+        aria-label={t('language.label')}
+        aria-expanded={isOpen}
+        aria-controls='language-options'
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        {language}
+      </StyledLanguageToggle>
+      <StyledLanguageOptions
+        id='language-options'
+        role='group'
+        aria-label={t('language.label')}
+        aria-hidden={!isOpen}
+        $isOpen={isOpen}
+      >
+        {(['EN', 'PL'] as const).map((option) => (
+          <StyledLanguageOption
+            key={option}
+            type='button'
+            aria-pressed={language === option}
+            tabIndex={isOpen ? 0 : -1}
+            onClick={() => chooseLanguage(option)}
+          >
+            {option}
+          </StyledLanguageOption>
+        ))}
+      </StyledLanguageOptions>
+    </StyledLanguagePicker>
+  )
+}
+
+const Menubar: React.FC = () => {
+  const { t } = useI18n()
+  const location = useLocation()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [hasScrolled, setHasScrolled] = useState(() => window.scrollY > 80)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const isScrolled = hasScrolled || location.pathname !== '/'
+
+  useEffect(() => {
+    const updateScrollState = () => setHasScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', updateScrollState, { passive: true })
+    return () => window.removeEventListener('scroll', updateScrollState)
+  }, [])
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.querySelector<HTMLAnchorElement>('#primary-navigation a')?.focus()
+
+    const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        const languageOptions = document.getElementById('language-options')
+        if (languageOptions?.getAttribute('aria-hidden') === 'false') return
+
+        setIsMobileMenuOpen(false)
+        toggleRef.current?.focus()
+        return
+      }
+
+      if (event.key === 'Tab') {
+        const menu = document.getElementById('primary-navigation')
+        const focusableElements = menu?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]):not([tabindex="-1"])',
+        )
+        const firstElement = focusableElements?.[0]
+        const lastElement = focusableElements?.[focusableElements.length - 1]
+
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault()
+          lastElement?.focus()
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault()
+          firstElement?.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', handleMenuKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleMenuKeyDown)
+    }
+  }, [isMobileMenuOpen])
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location.pathname])
+
+  return (
+    <StyledMenubar $isScrolled={isScrolled} $mobileMenuOpen={isMobileMenuOpen}>
+      <StyledBrand>
+        <Logo
+          large={false}
+          light={false}
+          lightText={!isScrolled && !isMobileMenuOpen}
+        />
+      </StyledBrand>
+      <StyledNav
+        id='primary-navigation'
+        aria-label={t('nav.label')}
+        $mobileMenuOpen={isMobileMenuOpen}
       >
         {menuItems.map((item) => (
           <StyledMenuLink
-            key={item.link}
-            to={item.link}
+            key={item.path}
+            to={item.path}
+            end={item.end}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <MenuButton text={t(item.button)} />
+            {t(item.label)}
           </StyledMenuLink>
         ))}
-      </StyledMobileMenu>
-    </>
+        <LanguagePicker />
+      </StyledNav>
+      <StyledMobileMenuToggle
+        ref={toggleRef}
+        type='button'
+        aria-label={isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+        aria-expanded={isMobileMenuOpen}
+        aria-controls='primary-navigation'
+        onClick={() => setIsMobileMenuOpen((open) => !open)}
+      >
+        <StyledToggleIcon $isOpen={isMobileMenuOpen} aria-hidden='true' />
+      </StyledMobileMenuToggle>
+    </StyledMenubar>
   )
 }
 
