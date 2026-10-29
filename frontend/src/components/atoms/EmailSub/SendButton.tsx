@@ -3,12 +3,12 @@ import styled from 'styled-components'
 import { useI18n } from '../../../i18n/I18nContext'
 
 const StyledSendButton = styled.button`
-max-width: 10rem;
+  max-width: 10rem;
   display: inline-block;
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.5);
   color: #000;
-    color: #4e4d47;
+  color: #4e4d47;
 
   font-weight: 500;
   font-size: 1rem;

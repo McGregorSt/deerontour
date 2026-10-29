@@ -2,9 +2,11 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 
 const StyledPostParagraph = styled.div<{ hidden?: boolean }>`
-  height: 100%;
-  font-size: 1.1rem;
-  padding: 5px 20px;
+  color: #4a5051;
+  font-size: 0.96rem;
+  line-height: 1.7;
+  padding: 0;
+  margin: 0 0 1.1rem;
   ${(props) =>
     props.hidden &&
     css`

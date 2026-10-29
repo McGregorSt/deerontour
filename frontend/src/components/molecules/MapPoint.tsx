@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import { useI18n } from '../../i18n/I18nContext'
 
 interface MapPointProps {
   countryCode: string
@@ -9,134 +10,162 @@ interface MapPointProps {
   x: string
   y: string
   description: string
-  animationDelay?: string
 }
 
-const StyledMapPoint = styled('button')<{ $x: string; $y: string; $animationDelay?: string }>`
-  width: 0.9rem;
-  height: 0.9rem;
-  padding: 0;
+const StyledPoint = styled.div<{ $x: string; $y: string }>`
   position: absolute;
+  top: ${({ $y }) => $y};
+  left: ${({ $x }) => $x};
+  transform: translate(-50%, -50%);
+`
+
+const StyledMarker = styled.button`
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  padding: 0;
   border: 0;
   border-radius: 50%;
-  background-color: transparent;
-  left: ${({ $x }) => $x};
-  top: ${({ $y }) => $y};
+  background: transparent;
   cursor: pointer;
-  
-  @media (max-width: 768px) {
-    scale: 0.5;
-    width: 0.4rem;
-    height: 0.4rem;
-  }
 
-  & > span {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    width: 0.9rem;
-    height: 0.9rem;
+  &::before {
+    width: 11px;
+    height: 11px;
+    border: 2px solid #fff;
     border-radius: 50%;
-    background-color: red;
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
-    animation: pulse-animation 2.6s ease-in-out infinite;
-    animation-delay: ${({ $animationDelay }) => $animationDelay || '0s'};
-    transform-origin: center center;
-    will-change: transform, box-shadow, opacity;
-    backface-visibility: hidden;
-    transition:
-      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 260ms ease,
-      opacity 260ms ease;
+    background: #d72f26;
+    box-shadow: 0 0 0 4px rgba(215, 47, 38, 0.18);
+    content: '';
+    transition: box-shadow 180ms ease, transform 180ms ease;
   }
 
-  @keyframes pulse-animation {
-    0% {
-      transform: translate(-50%, -50%) scale(0.95);
-      box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.65);
-      opacity: 1;
-    }
-    30% {
-      transform: translate(-50%, -50%) scale(1.03);
-      box-shadow: 0 0 0 6px rgba(255, 0, 0, 0.28);
-      opacity: 0.95;
-    }
-    60% {
-      transform: translate(-50%, -50%) scale(1.02);
-      box-shadow: 0 0 0 10px rgba(255, 0, 0, 0.12);
-      opacity: 0.85;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(0.95);
-      box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-      opacity: 1;
-    }
+  &:hover::before,
+  &[aria-expanded='true']::before {
+    box-shadow: 0 0 0 7px rgba(215, 47, 38, 0.2);
+    transform: scale(1.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #a33b2f;
+    outline-offset: 0;
   }
 `
 
-const StyledPopup = styled('div')`
-  width: 250px;
-  height: auto;
-  max-width: 80vw;
-  background-color: #b1b1ea;
-  color: #333;
-  z-index: 99;
-  position: fixed;
-  top: -10px;
-  left: 110%;
-  transform: translateY(-50%) scale(0.92);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-  padding: 12px;
-  text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', Roboto, Arial, sans-serif;
-  transition:
-    transform 180ms ease,
-    opacity 180ms ease;
-  opacity: 0.98;
+const StyledPopup = styled.div<{ $visible: boolean; $alignRight: boolean }>`
+  position: absolute;
+  z-index: 3;
+  bottom: calc(100% + 0.35rem);
+  ${({ $alignRight }) => ($alignRight ? 'right: 0;' : 'left: 50%;')}
+  width: min(15rem, 72vw);
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(38, 39, 32, 0.08);
+  background: rgba(250, 249, 246, 0.98);
+  box-shadow: 0 8px 24px rgba(35, 37, 26, 0.14);
+  color: #282923;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  pointer-events: ${({ $visible }) => ($visible ? 'auto' : 'none')};
+  transform: ${({ $alignRight, $visible }) => (
+    `${$alignRight ? 'translateX(0)' : 'translateX(-50%)'} translateY(${$visible ? '0' : '0.35rem'})`
+  )};
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+  visibility: ${({ $visible }) => ($visible ? 'visible' : 'hidden')};
+
+  h3 {
+    margin: 0;
+    font-family: 'Alumni Sans Pinstripe', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  p {
+    margin: 0.45rem 0 0.6rem;
+    color: #696a62;
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`
+
+const StyledCountryLink = styled(Link)`
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 0.55rem;
+  color: #8e332b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
 
   &:hover {
-    transform: translateY(-50%) scale(1);
+    color: #54201b;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 `
 
-const MapPoint: React.FC<MapPointProps> = ({ countryName, country, x, y, description }) => {
+const MapPoint: React.FC<MapPointProps> = ({ countryCode, countryName, country, x, y, description }) => {
+  const { t } = useI18n()
   const navigate = useNavigate()
-  const [displayPopup, setDisplayPopup] = useState<Boolean>(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const countryPostsPath = `/posts?country=${encodeURIComponent(countryName)}`
 
-  // small random delay so multiple points pulse out-of-sync
-  const animationDelay = `${(Math.random() * 2.4).toFixed(2)}s`
+  const handleMarkerClick = () => {
+    const supportsHover = typeof window.matchMedia === 'function'
+      && window.matchMedia('(hover: hover) and (pointer: fine)').matches
 
-  const handleCountryClick = () => {
-    navigate(`/posts?country=${encodeURIComponent(countryName)}`)
+    if (supportsHover) {
+      navigate(countryPostsPath)
+      return
+    }
+
+    setIsOpen((open) => !open)
   }
 
   return (
-    <StyledMapPoint
-      type='button'
+    <StyledPoint
       $x={x}
       $y={y}
-      $animationDelay={animationDelay}
-      aria-label={countryName}
-      title={countryName}
-      onClick={handleCountryClick}
-      onMouseOver={() => setDisplayPopup(true)}
-      onMouseLeave={() => setDisplayPopup(false)}
+      data-country={countryCode}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+      onFocus={() => setIsOpen(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsOpen(false)
+      }}
     >
-      <span />
-      {displayPopup && (
-        <StyledPopup>
-          <h3 style={{ margin: '8px 0' }}>{country}</h3>
-          <p style={{ margin: 0 }}>{description}</p>
-        </StyledPopup>
-      )}
-    </StyledMapPoint>
+      <StyledMarker
+        type='button'
+        aria-label={country}
+        aria-expanded={isOpen}
+        aria-controls={`map-country-${countryCode}`}
+        title={country}
+        onClick={handleMarkerClick}
+      />
+      <StyledPopup
+        id={`map-country-${countryCode}`}
+        $visible={isOpen}
+        $alignRight={Number.parseFloat(x) > 60}
+      >
+        <h3>{country}</h3>
+        <p>{description}</p>
+        <StyledCountryLink to={countryPostsPath}>
+          {t('home.viewCountryPosts')} <span aria-hidden='true'>→</span>
+        </StyledCountryLink>
+      </StyledPopup>
+    </StyledPoint>
   )
 }
 

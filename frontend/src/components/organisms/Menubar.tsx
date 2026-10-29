@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
 import { Language, TranslationKey } from '../../i18n/translations'
 import Logo from '../molecules/Logo'
 
-const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boolean }>`
+const StyledMenubar = styled.header<{
+  $isHome: boolean
+  $isScrolled: boolean
+  $mobileMenuOpen: boolean
+}>`
   position: fixed;
   inset: ${({ $isScrolled }) => ($isScrolled ? '0.75rem 1.25rem auto' : '0 0 auto')};
   z-index: 1002;
@@ -14,14 +18,15 @@ const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boo
   justify-content: space-between;
   width: ${({ $isScrolled }) => ($isScrolled ? 'calc(100% - 2.5rem)' : '100%')};
   height: ${({ $isScrolled }) => ($isScrolled ? '5.5rem' : '6.75rem')};
-  border-radius: ${({ $isScrolled }) => ($isScrolled ? '5px' : '0')};
+  border-radius: ${({ $isScrolled }) => ($isScrolled ? '50px' : '0')};
   padding: 0 clamp(1.25rem, 5vw, 5rem);
-  background-color: ${({ $isScrolled, $mobileMenuOpen }) => {
+  background-color: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => {
     if ($mobileMenuOpen) return 'rgba(248, 247, 243, 0.98)'
-    return $isScrolled ? 'rgba(250, 249, 246, 0.58)' : 'transparent'
+    if ($isHome && !$isScrolled) return 'transparent'
+    return $isScrolled ? 'rgba(250, 249, 246, 0.58)' : '#fff'
   }};
-  color: ${({ $isScrolled, $mobileMenuOpen }) => (
-    $isScrolled || $mobileMenuOpen ? '#262720' : '#fff'
+  color: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => (
+    !$isHome || $isScrolled || $mobileMenuOpen ? '#262720' : '#fff'
   )};
   backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
   -webkit-backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
@@ -53,7 +58,9 @@ const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boo
     border-radius: inherit;
     background: linear-gradient(180deg, rgba(5, 8, 7, 0.78) 0%, rgba(5, 8, 7, 0.36) 68%, rgba(5, 8, 7, 0) 100%);
     content: '';
-    opacity: ${({ $isScrolled, $mobileMenuOpen }) => ($isScrolled || $mobileMenuOpen ? 0 : 1)};
+    opacity: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => (
+      $isHome && !$isScrolled && !$mobileMenuOpen ? 1 : 0
+    )};
     pointer-events: none;
     transition: opacity 300ms ease;
   }
@@ -80,7 +87,17 @@ const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boo
   }
 `
 
-const StyledBrand = styled.div`
+const StyledMenubarSpacer = styled.div<{ $isHome: boolean }>`
+  flex: 0 0 ${({ $isHome }) => ($isHome ? '0' : '6.75rem')};
+  height: ${({ $isHome }) => ($isHome ? '0' : '6.75rem')};
+
+  @media (max-width: 1024px) {
+    flex-basis: ${({ $isHome }) => ($isHome ? '0' : '5rem')};
+    height: ${({ $isHome }) => ($isHome ? '0' : '5rem')};
+  }
+`
+
+const StyledBrand = styled.div<{ $post: boolean }>`
   position: relative;
   z-index: 1003;
   flex: 0 0 auto;
@@ -113,6 +130,58 @@ const StyledBrand = styled.div`
 
     & > div > a > div:last-child > div:last-child {
       font-size: 0.48rem;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    ${({ $post }) => $post && `
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+
+      & > div > a > div:first-child {
+        width: 2rem;
+        height: 2.5rem;
+      }
+
+      & > div > a > div:last-child {
+        width: 7.5rem;
+      }
+
+      & > div > a > div:last-child > div:first-child {
+        font-size: 0.82rem;
+      }
+
+      & > div > a > div:last-child > div:last-child {
+        font-size: 0.38rem;
+        letter-spacing: 0.22rem;
+      }
+    `}
+  }
+`
+
+const StyledPostBackLink = styled(Link)`
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: inline-flex;
+    position: relative;
+    z-index: 1003;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    color: inherit;
+    font-size: 0.75rem;
+    text-decoration: none;
+
+    &::before {
+      content: '←';
+      font-size: 1.2rem;
+    }
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 3px;
     }
   }
 `
@@ -445,7 +514,9 @@ const Menubar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(() => window.scrollY > 80)
   const toggleRef = useRef<HTMLButtonElement>(null)
-  const isScrolled = hasScrolled || location.pathname !== '/'
+  const isHome = location.pathname === '/'
+  const isPost = location.pathname.startsWith('/tours/details/')
+  const isScrolled = hasScrolled
 
   useEffect(() => {
     const updateScrollState = () => setHasScrolled(window.scrollY > 80)
@@ -500,42 +571,50 @@ const Menubar: React.FC = () => {
   }, [location.pathname])
 
   return (
-    <StyledMenubar $isScrolled={isScrolled} $mobileMenuOpen={isMobileMenuOpen}>
-      <StyledBrand>
-        <Logo
-          large={false}
-          light={false}
-          lightText={!isScrolled && !isMobileMenuOpen}
-        />
-      </StyledBrand>
-      <StyledNav
-        id='primary-navigation'
-        aria-label={t('nav.label')}
+    <>
+      <StyledMenubar
+        $isHome={isHome}
+        $isScrolled={isScrolled}
         $mobileMenuOpen={isMobileMenuOpen}
       >
-        {menuItems.map((item) => (
-          <StyledMenuLink
-            key={item.path}
-            to={item.path}
-            end={item.end}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            {t(item.label)}
-          </StyledMenuLink>
-        ))}
-        <LanguagePicker />
-      </StyledNav>
-      <StyledMobileMenuToggle
-        ref={toggleRef}
-        type='button'
-        aria-label={isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-        aria-expanded={isMobileMenuOpen}
-        aria-controls='primary-navigation'
-        onClick={() => setIsMobileMenuOpen((open) => !open)}
-      >
-        <StyledToggleIcon $isOpen={isMobileMenuOpen} aria-hidden='true' />
-      </StyledMobileMenuToggle>
-    </StyledMenubar>
+        {isPost && <StyledPostBackLink to='/tours'>{t('nav.back')}</StyledPostBackLink>}
+        <StyledBrand $post={isPost}>
+          <Logo
+            large={false}
+            light={false}
+            lightText={isHome && !isScrolled && !isMobileMenuOpen}
+          />
+        </StyledBrand>
+        <StyledNav
+          id='primary-navigation'
+          aria-label={t('nav.label')}
+          $mobileMenuOpen={isMobileMenuOpen}
+        >
+          {menuItems.map((item) => (
+            <StyledMenuLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t(item.label)}
+            </StyledMenuLink>
+          ))}
+          <LanguagePicker />
+        </StyledNav>
+        <StyledMobileMenuToggle
+          ref={toggleRef}
+          type='button'
+          aria-label={isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+          aria-expanded={isMobileMenuOpen}
+          aria-controls='primary-navigation'
+          onClick={() => setIsMobileMenuOpen((open) => !open)}
+        >
+          <StyledToggleIcon $isOpen={isMobileMenuOpen} aria-hidden='true' />
+        </StyledMobileMenuToggle>
+      </StyledMenubar>
+      <StyledMenubarSpacer $isHome={isHome} aria-hidden='true' />
+    </>
   )
 }
 

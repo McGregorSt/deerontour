@@ -11,38 +11,58 @@ import { continentTranslationKeys } from '../../i18n/translations'
 
 const StyledPostWrapper = styled.div`
   display: flex;
-  width: 100vw;
+  width: 100%;
   flex-direction: column;
   background: #f8f6f1;
   min-height: 100vh;
-  margin-top: 11vh;
 `
 
 const HeroSection = styled.header`
   position: relative;
-  min-height: 89vh;
-  /* width: 100%; */
+  width: min(calc(100% - 3rem), 1440px);
+  min-height: clamp(24rem, 42vw, 38rem);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-
-  padding: 1.5rem clamp(1rem, 3vw, 3rem) 2.5rem;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 3vw, 3rem) 3rem;
   color: #f5f0ea;
+
+  @media (max-width: 768px) {
+    width: calc(100% - 2rem);
+    min-height: 0;
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    padding: clamp(11rem, 48vw, 14rem) 1.25rem 1rem;
+    color: #252a2b;
+  }
 `
 
 const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: number }>`
   position: absolute;
-  inset: -8% -4% -1% -4%;
+  inset: -3% -1% -1%;
   background-image:
-    linear-gradient(180deg, rgba(15, 18, 20, 0.15) 0%, rgba(15, 18, 20, 0.7) 100%),
+    linear-gradient(180deg, rgba(15, 18, 20, 0.08) 0%, rgba(15, 18, 20, 0.55) 100%),
     url(${(props) => props.$backgroundImage});
   background-size: cover;
-  /* scale: .58; */
   background-position: center;
   background-repeat: no-repeat;
   transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0)
     scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
   will-change: transform;
+
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+    will-change: auto;
+  }
+
+  @media (max-width: 768px) {
+    inset: 0 0 auto;
+    height: clamp(11rem, 48vw, 14rem);
+    background-image: url(${(props) => props.$backgroundImage});
+    transform: none;
+  }
 `
 
 const HeroInner = styled.div<{ $scrollProgress: number }>`
@@ -52,10 +72,23 @@ const HeroInner = styled.div<{ $scrollProgress: number }>`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
   transform: translate3d(0, ${(props) => props.$scrollProgress * 18}px, 0);
   opacity: ${(props) => 1 - props.$scrollProgress * 0.38};
   transition: opacity 0.15s ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+    transition: none;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    width: 100%;
+    gap: 0.35rem;
+    transform: none;
+    opacity: 1;
+  }
 `
 
 const HeroKicker = styled.p`
@@ -65,17 +98,43 @@ const HeroKicker = styled.p`
   text-transform: uppercase;
   font-weight: 700;
   opacity: 0.9;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const MobileByline = styled.p`
+  display: none;
+  margin: 0;
+  color: #5b6060;
+  font-size: 0.75rem;
+
+  span {
+    color: #343a3b;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `
 
 const HeroTitle = styled.h1`
   margin: 0;
   max-width: 780px;
-  font-size: clamp(3.25rem, 6vw, 6.25rem);
+  font-size: clamp(3rem, 5.2vw, 5.5rem);
   line-height: 0.94;
-  letter-spacing: -0.06em;
-  font-family: 'Darker Grotesque', sans-serif;
-  font-weight: 800;
-  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  font-family: Georgia, serif;
+  font-weight: 400;
+
+  @media (max-width: 768px) {
+    color: #252a2b;
+    font-size: clamp(1.9rem, 8vw, 2.35rem);
+    line-height: 1.1;
+  }
 `
 
 const HeroMeta = styled.div`
@@ -83,137 +142,168 @@ const HeroMeta = styled.div`
   flex-wrap: wrap;
   gap: 1rem 2rem;
   font-size: 0.88rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: rgba(245, 240, 234, 0.9);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `
 
-const HeroReadMore = styled.a`
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #f5f0ea;
-  text-decoration: none;
-  opacity: 0.9;
+const MobileMeta = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    color: #4c504f;
+    font-size: 0.63rem;
+    letter-spacing: 0.11em;
+  }
 `
 
-const HeroArrow = styled.span`
-  font-size: 1.45rem;
-  line-height: 1;
+const MobileSubtitle = styled.p`
+  display: none;
+  margin: 0.35rem 0 0.75rem;
+  color: #495052;
+  font-size: 1rem;
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `
 
 const StyledPostContainer = styled.div`
-  width: min(100%, 1220px);
+  width: min(calc(100% - 3rem), 1220px);
   margin: 0 auto;
-  padding: 0 1rem 4rem;
+  padding: 0 0 4rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding-bottom: 2rem;
+  }
 `
 
 const IntroSection = styled.section`
-  padding-top: 3.5rem;
-  padding-bottom: 2rem;
-  width: min(100%, 800px);
-  margin: 0 auto;
-`
-
-const IntroMeta = styled.div`
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(33, 33, 33, 0.68);
-  font-weight: 700;
-  margin-bottom: 1rem;
+  padding: 0 0 1.5rem;
+  width: 100%;
 `
 
 const IntroLead = styled.p`
-  margin: 0 0 1.5rem;
-  font-size: clamp(1.5rem, 2vw, 2.2rem);
-  line-height: 1.3;
-  letter-spacing: -0.04em;
-  color: #191b1d;
-  font-family: 'Darker Grotesque', sans-serif;
-  font-weight: 600;
-`
+  margin: 0;
+  color: #4a5051;
+  font-size: 1.08rem;
+  line-height: 1.65;
 
-const LocationPills = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  margin-bottom: 1.8rem;
-`
+  @media (min-width: 769px) {
+    max-width: 42rem;
+    font-size: 1.18rem;
+    line-height: 1.7;
+  }
 
-const LocationPill = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.9rem;
-  border: 1px solid rgba(28, 28, 28, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
-  font-size: 0.74rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(25, 27, 29, 0.8);
-`
-
-const SnapshotCard = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  width: min(100%, 520px);
-  padding: 1.2rem 1.3rem;
-  border: 1px solid rgba(0, 0, 0, 0.09);
-  background: rgba(255, 255, 255, 0.42);
-  border-radius: 5px;
-  box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.01);
-  -webkit-box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.05);
-`
-
-const SnapshotItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-`
-
-const SnapshotLabel = styled.span`
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(25, 27, 29, 0.62);
-  font-weight: 700;
-`
-
-const SnapshotValue = styled.span`
-  font-size: 1.05rem;
-  color: #191b1d;
-  font-weight: 600;
+  @media (max-width: 768px) {
+    padding-bottom: 1.25rem;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
 `
 
 const ArticleLayout = styled.div`
   display: grid;
-  grid-template-columns: 320px minmax(0, 800px);
-  gap: 5.5rem;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 740px);
+  gap: clamp(2rem, 6vw, 5rem);
   align-items: start;
-  padding-top: 1rem;
+  justify-content: center;
+  padding-top: 2rem;
 
   & > div:first-child {
     align-self: stretch;
   }
 
-  @media (max-width: 1080px) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 0.75rem;
+
+    & > div:first-child {
+      display: none;
+    }
   }
 `
 
 const ArticleContent = styled.div`
   width: 100%;
+  min-width: 0;
+
+  & > p {
+    padding: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 1.25rem;
+  }
+`
+
+const ArticleSidebar = styled.aside`
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  position: sticky;
+  top: 8rem;
+  max-height: calc(100vh - 9rem);
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const TripDetails = styled.section`
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(38, 39, 32, 0.1);
+  background: rgba(255, 255, 255, 0.48);
+`
+
+const TripDetailsTitle = styled.h2`
+  margin: 0 0 0.9rem;
+  color: #333630;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+`
+
+const TripDetailsList = styled.dl`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+  margin: 0;
+
+  div {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  dt {
+    color: #777a72;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    color: #343730;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
 `
 
 const ImageTextPair = styled.div<{ $reverse: boolean }>`
@@ -285,100 +375,31 @@ const ChapterDivider = styled.div`
 
 const StyledPostSection = styled.section`
   width: 100%;
-  scroll-margin-top: 6.5rem;
-  margin-bottom: 3.5rem;
+  scroll-margin-top: 8rem;
+  margin-bottom: 2.5rem;
 `
 
 const ArticleHeader = styled.header`
   display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
-  align-items: end;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.55rem;
+  margin-bottom: 0.7rem;
 `
 
 const SectionNumber = styled.span`
-  font-size: 0.86rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: rgba(25, 27, 29, 0.55);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  color: #85877f;
+  font-family: Georgia, serif;
+  font-size: 1rem;
 `
 
 const SectionTitle = styled.h2`
   margin: 0;
-  font-size: clamp(2.15rem, 3vw, 3.25rem);
-  line-height: 0.96;
-  letter-spacing: -0.035em;
-  font-family: 'Darker Grotesque', sans-serif;
-  font-weight: 700;
-  color: #1a1b1d;
-`
-
-const RoutePanel = styled.aside`
-  margin-top: 1.5rem;
-  padding: 1rem 0 0;
-  border-top: 1px solid rgba(25, 27, 29, 0.18);
-`
-
-const RouteTitle = styled.h3`
-  margin: 0 0 1rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(25, 27, 29, 0.7);
-  font-weight: 700;
-`
-
-const RouteMap = styled.div`
-  position: relative;
-  padding: 1.5rem 1rem 0.75rem;
-  border: 1px solid rgba(25, 27, 29, 0.12);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(240, 235, 228, 0.9));
-  min-height: 180px;
-`
-
-const RouteLine = styled.div`
-  position: absolute;
-  inset: 1.5rem 2.5rem 2rem 2.5rem;
-  border-radius: 999px;
-  border-left: 2px solid rgba(25, 27, 29, 0.18);
-  border-top: 2px solid rgba(25, 27, 29, 0.18);
-  transform: rotate(12deg);
-  opacity: 0.8;
-`
-
-const RoutePointList = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  z-index: 1;
-`
-
-const RoutePointButton = styled.button<{ $active?: boolean }>`
-  all: unset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  color: ${(props) => (props.$active ? '#171819' : 'rgba(23, 24, 25, 0.7)')};
-  font-size: 0.82rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-
-  &::before {
-    content: '';
-    display: inline-block;
-    width: 0.6rem;
-    height: 0.6rem;
-    border-radius: 50%;
-    background: ${(props) => (props.$active ? '#1a1b1d' : 'rgba(25, 27, 29, 0.36)')};
-    box-shadow: 0 0 0 4px rgba(26, 27, 29, 0.08);
-  }
+  color: #292e30;
+  font-family: Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-weight: 400;
+  line-height: 1.25;
 `
 
 const StyledPost = styled.div`
@@ -388,12 +409,6 @@ const StyledPost = styled.div`
 const getPullQuote = (text: string): string | null => {
   const sentence = text.match(/[^.!?]+[.!?]/)?.[0].trim()
   return sentence && sentence.length >= 100 ? sentence : null
-}
-
-const getGalleryWidthFactor = (imageCount: number, seed: number): number => {
-  const baseWidth = imageCount === 1 ? 1.5 : imageCount === 2 ? 1.3 : imageCount === 3 ? 1.2 : 1.08
-  const variation = (((seed * 7) % 5) - 2) * 0.045
-  return Math.max(1.05, baseWidth + variation)
 }
 
 const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
@@ -419,10 +434,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
 
   const postGalleryFlat = useMemo(() => galleryGroups.flat(), [galleryGroups])
 
-  const heroImage =
-    post?.imageUrl ||
-    postGalleryFlat[0]?.src ||
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80'
+  const heroImage = post?.hero?.backgroundImage || post?.imageUrl || postGalleryFlat[0]?.src || ''
 
   useEffect(() => {
     if (initialPost) {
@@ -455,7 +467,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
     }
 
     fetchPost()
-  }, [country, initialPost, language])
+  }, [country, initialPost, language, t])
 
   useEffect(() => {
     const handleHeroScroll = () => {
@@ -556,11 +568,6 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
     window.scrollTo({ top, behavior: 'smooth' })
   }
 
-  const routeLocations = tocItems.map((item, index) => ({
-    ...item,
-    label: item.title,
-    index,
-  }))
   const galleryGroupsBySection = Array.from({ length: post.textParagraphs.length }, () => [] as IImage[][])
   galleryGroups.forEach((group, groupIndex) => {
     if (galleryGroupsBySection.length > 0) {
@@ -573,86 +580,103 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   })
   const continentKey = continentTranslationKeys[post.continent.toLowerCase()]
   const continentLabel = continentKey ? t(continentKey) : post.continent
+  const dateLabel = new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+  const durationDays = Math.max(
+    1,
+    Math.floor((new Date(post.tourEnd).getTime() - new Date(post.tourStart).getTime()) / 86400000) + 1,
+  )
+  const hasTravelDates = Number.isFinite(new Date(post.tourStart).getTime())
+    && Number.isFinite(new Date(post.tourEnd).getTime())
+  const metadataHasDuration = Boolean(post.metadata?.some((item) => /duration/i.test(item.label)))
+  const metadataHasLocation = Boolean(post.metadata?.some((item) => /location/i.test(item.label)))
+  const metadataHasTravelDates = Boolean(post.metadata?.some((item) => /travel dates|date range/i.test(item.label)))
 
   return (
     <StyledPostWrapper>
       <HeroSection ref={heroRef}>
         <HeroBackground
-          $backgroundImage={post.hero?.backgroundImage ?? 'asd'}
+          $backgroundImage={heroImage}
           $scrollProgress={heroScrollProgress}
         />
         <HeroInner $scrollProgress={heroScrollProgress}>
           <HeroKicker>
-            {(post.countryLabel || post.country).toUpperCase()} / {t('post.travelStory')}
+            {continentLabel.toUpperCase()} · {(post.countryLabel || post.country).toUpperCase()}
           </HeroKicker>
-          <HeroTitle>{post.title}</HeroTitle>
-          <HeroMeta>
-            <span>{post.author}</span>
-            <span>
-              {new Date(post.createdAt).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </span>
+          <MobileMeta>
+            <span>{continentLabel.toUpperCase()}</span>
+            <span>·</span>
+            <span>{dateLabel}</span>
+            <span>·</span>
             <span>{post.hero?.readingTime ?? t('post.readingTime')}</span>
+          </MobileMeta>
+          <HeroTitle>{post.title}</HeroTitle>
+          {post.subtitle && <MobileSubtitle>{post.subtitle}</MobileSubtitle>}
+          <HeroMeta>
+            <span>{post.hero?.readingTime ?? t('post.readingTime')}</span>
+            <span>{dateLabel}</span>
+            <span>{t('post.by')} {post.author}</span>
           </HeroMeta>
-          <HeroReadMore href='#overview'>
-            <HeroArrow>↓</HeroArrow>
-            <span>{t('post.readMore')}</span>
-          </HeroReadMore>
+          <MobileByline>{t('post.by')} <span>{post.author}</span></MobileByline>
         </HeroInner>
       </HeroSection>
 
       <StyledPostContainer>
-        <IntroSection id='overview'>
-          <IntroMeta>{post.hero?.readingTime ?? t('post.readingTime')}</IntroMeta>
-          <IntroLead>{post.textLead}</IntroLead>
-          <LocationPills>
-            <LocationPill>{post.countryLabel || post.country}</LocationPill>
-            <LocationPill>{post.subtitle}</LocationPill>
-            <LocationPill>{continentLabel}</LocationPill>
-          </LocationPills>
-          {post.metadata && post.metadata.length > 0 && (
-            <SnapshotCard>
-              {post.metadata.map((item) => (
-                <SnapshotItem key={item.label}>
-                  <SnapshotLabel>{item.label}</SnapshotLabel>
-                  <SnapshotValue>{item.value}</SnapshotValue>
-                </SnapshotItem>
-              ))}
-            </SnapshotCard>
-          )}
-        </IntroSection>
-
         <ArticleLayout>
-          <div>
+          <ArticleSidebar>
             <PostTableOfContents
               items={tocItems}
               activeId={activeSectionId}
               onSelect={handleSectionClick}
             />
-            {/* <RoutePanel>
-              <RouteTitle>Your route</RouteTitle>
-              <RouteMap>
-                <RouteLine />
-                <RoutePointList>
-                  {routeLocations.map((routePoint) => (
-                    <RoutePointButton
-                      key={routePoint.id}
-                      type="button"
-                      $active={activeSectionId === routePoint.id}
-                      onClick={() => handleSectionClick(routePoint.id)}
-                    >
-                      {routePoint.label}
-                    </RoutePointButton>
+            {(post.metadata?.length || hasTravelDates) && (
+              <TripDetails>
+                <TripDetailsTitle>{t('post.tripDetails')}</TripDetailsTitle>
+                <TripDetailsList>
+                  {hasTravelDates && !metadataHasDuration && (
+                    <div>
+                      <dt>{t('post.duration')}</dt>
+                      <dd>{durationDays} {t('tours.days')}</dd>
+                    </div>
+                  )}
+                  {hasTravelDates && !metadataHasTravelDates && (
+                    <div>
+                      <dt>{t('post.travelDates')}</dt>
+                      <dd>
+                        {new Date(post.tourStart).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB')}
+                        {' – '}
+                        {new Date(post.tourEnd).toLocaleDateString(language === 'PL' ? 'pl-PL' : 'en-GB')}
+                      </dd>
+                    </div>
+                  )}
+                  {!metadataHasLocation && <div>
+                    <dt>{t('post.location')}</dt>
+                    <dd>{post.countryLabel || post.country}</dd>
+                  </div>}
+                  {post.metadata?.map((item) => (
+                    <div key={item.label}>
+                      <dt>{item.label}</dt>
+                      <dd>{item.value}</dd>
+                    </div>
                   ))}
-                </RoutePointList>
-              </RouteMap>
-            </RoutePanel> */}
-          </div>
+                </TripDetailsList>
+              </TripDetails>
+            )}
+          </ArticleSidebar>
 
           <ArticleContent>
+            <IntroSection id='overview'>
+              <IntroLead>{post.textLead}</IntroLead>
+            </IntroSection>
+            <PostTableOfContents
+              items={tocItems}
+              activeId={activeSectionId}
+              onSelect={handleSectionClick}
+              variant='inline'
+            />
             {post.textParagraphs.map((paragraph, index) => {
               const sectionId = tocItems[index]?.id ?? `paragraph-${index}`
               const sectionGroups = galleryGroupsBySection[index] ?? []
@@ -707,14 +731,6 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
                               key={`${sectionId}-${textIndex}-gallery-${groupIndex}`}
                               imagesToDisplay={imageGroup}
                               imagesArr={postGalleryFlat}
-                              wide
-                              widthFactor={getGalleryWidthFactor(
-                                imageGroup.length,
-                                index * 11 + textIndex * 5 + groupIndex,
-                              )}
-                              offsetPercent={
-                                ((index * 11 + textIndex * 13 + groupIndex * 17 + post.country.length) % 13) - 6
-                              }
                             />
                           ))}
                         </React.Fragment>
@@ -726,9 +742,6 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
                           key={`${sectionId}-gallery-${groupIndex}`}
                           imagesToDisplay={imageGroup}
                           imagesArr={postGalleryFlat}
-                          wide
-                          widthFactor={getGalleryWidthFactor(imageGroup.length, index * 11 + groupIndex)}
-                          offsetPercent={((index * 11 + groupIndex * 17 + post.country.length) % 13) - 6}
                         />
                       ))}
                   </StyledPostSection>

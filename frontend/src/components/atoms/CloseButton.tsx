@@ -2,7 +2,8 @@ import React from 'react'
 import closeIcon from '../../assets/share/close.svg'
 import styled from 'styled-components'
 
-const StyledCloseButton = styled.div`
+const StyledCloseButton = styled.button`
+  display: flex;
   width: 3rem;
   height: 3rem;
   position: fixed;
@@ -10,7 +11,9 @@ const StyledCloseButton = styled.div`
   right: 1rem;
   scale: 0.9;
   padding: 0.7rem;
-  /* border-radius: 999px; */
+  align-items: center;
+  justify-content: center;
+  border: 0;
   background-color: transparent;
   transition: background-color 0.1s ease-in;
   background-color: rgba(204, 52, 52, 0.6);
@@ -23,12 +26,20 @@ const StyledCloseButton = styled.div`
   }
 `
 
-const CloseButton: React.FC<{ setGalleryCarousel: () => void }> = ({ setGalleryCarousel }) => {
+const CloseButton: React.FC<{ label: string; setGalleryCarousel: () => void }> = ({
+  label,
+  setGalleryCarousel,
+}) => {
   return (
-    <StyledCloseButton onClick={() => setGalleryCarousel()}>
+    <StyledCloseButton
+      type='button'
+      aria-label={label}
+      data-lightbox-close
+      onClick={setGalleryCarousel}
+    >
       <img
         src={closeIcon}
-        alt='closeIcon'
+        alt=''
       />
     </StyledCloseButton>
   )

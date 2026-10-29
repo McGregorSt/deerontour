@@ -5,8 +5,8 @@ import { MemoryRouter } from 'react-router-dom'
 import Menubar from './Menubar'
 import { I18nProvider } from '../../i18n/I18nContext'
 
-const renderMenubar = () => render(
-  <MemoryRouter>
+const renderMenubar = (initialPath = '/') => render(
+  <MemoryRouter initialEntries={[initialPath]}>
     <I18nProvider>
       <Menubar />
     </I18nProvider>
@@ -23,6 +23,24 @@ test('renders navigation and the mobile menu toggle', () => {
   expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /contact/i })).toHaveAttribute('href', '/contact')
   expect(screen.getByRole('button', { name: /open navigation menu/i })).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('uses a solid header and reserves its layout space on internal pages', () => {
+  renderMenubar('/tours')
+
+  const header = screen.getByRole('banner')
+  const styles = window.getComputedStyle(header)
+
+  expect(styles.position).toBe('fixed')
+  expect(styles.backgroundColor).toBe('rgb(255, 255, 255)')
+  expect(header.nextElementSibling).toHaveStyle({ height: '6.75rem' })
+  expect(screen.getByRole('button', { name: /open navigation menu/i })).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('shows a contextual back link on individual posts', () => {
+  renderMenubar('/tours/details/iceland')
+
+  expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute('href', '/tours')
 })
 
 test('opens the mobile menu and locks background scrolling', async () => {

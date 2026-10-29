@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import GalleryCarousel from '../organisms/GalleryCarrousel'
 import { IImage } from '../organisms/PostGallery'
+import { useI18n } from '../../i18n/I18nContext'
 
 interface Props {
   src: string
@@ -38,32 +39,37 @@ const getImageUrl = (src: string): string => {
   return `${publicUrl}${path}`
 }
 
-const StyledPhoto = styled.div<{ src: string }>`
-  border: 1px solid #aaa;
+const StyledPhoto = styled.button<{ src: string }>`
+  display: block;
+  padding: 0;
+  border: 0;
   background-image: url(${({ src }) => getImageUrl(src)});
   background-size: cover;
   background-position: center;
   min-height: 180px;
   width: 100%;
-  box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: 0px 0px 23px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
+  border-radius: 4px;
+  cursor: zoom-in;
+
+  &:focus-visible {
+    outline: 2px solid #a33b2f;
+    outline-offset: 3px;
+  }
 
   &:hover {
-    transform: scale(1.005);
-    cursor: pointer;
-    border: 1px solid #999;
-    transition-duration: 200ms;
+    filter: brightness(0.96);
   }
-  &:not(:hover) {
-    transition-duration: 100ms;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 `
 
 const Photo: React.FC<Props> = ({ src, images, startPicIndex }) => {
   const [galleryCarousel, setGalleryCarousel] = useState(false)
+  const { t } = useI18n()
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     setGalleryCarousel(true)
   }
 
@@ -71,40 +77,22 @@ const Photo: React.FC<Props> = ({ src, images, startPicIndex }) => {
     setGalleryCarousel(false)
   }
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setGalleryCarousel(false)
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  })
-
-  return galleryCarousel ? (
-    (console.log('startPicIndex:', startPicIndex),
-    (
-      <>
+  return (
+    <>
+      <StyledPhoto
+        type='button'
+        src={src}
+        aria-label={`${t('post.openPhoto')} ${startPicIndex + 1} ${t('post.photoOf')} ${images.length}`}
+        onClick={handleClick}
+      />
+      {galleryCarousel && (
         <GalleryCarousel
-          src={src}
           startPicIndex={startPicIndex}
           images={images}
           setGalleryCarousel={handleGalleryCarousel}
         />
-        <StyledPhoto
-          src={src}
-        />
-      </>
-    ))
-  ) : (
-    <StyledPhoto
-      // imagesize={imagesize}
-      src={src}
-      onClick={handleClick}
-    />
+      )}
+    </>
   )
 }
 

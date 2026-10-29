@@ -5,6 +5,7 @@ import MoveBtn from '../atoms/MoveBtn'
 import { IImage } from './PostGallery'
 import CloseButton from '../atoms/CloseButton'
 import LargePic from '../atoms/LargePic'
+import { useI18n } from '../../i18n/I18nContext'
 
 const StyledCarouselWrapper = styled.div`
   width: 100vw;
@@ -50,13 +51,14 @@ const StyledLargePicBackgorund = styled.div<{ src: string }>`
 `
 
 const GalleryCarousel: React.FC<{
-  src: string
   startPicIndex: number
   images: IImage[]
   setGalleryCarousel: () => void
-}> = ({ src, startPicIndex, images, setGalleryCarousel }) => {
+}> = ({ startPicIndex, images, setGalleryCarousel }) => {
+  const { t } = useI18n()
   const [nextPictureIndex, setNextPictureIndex] = useState(startPicIndex)
   const touchStartX = useRef<number | null>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   const [lastPicture, setLastPicture] = useState(false)
   const [firstPicture, setFirstPicture] = useState(false)
@@ -98,10 +100,38 @@ const GalleryCarousel: React.FC<{
         setNextPictureIndex(nextPictureIndex - 1)
       } else if (e.key === 'Escape') {
         setGalleryCarousel()
+      } else if (e.key === 'Tab') {
+        const controls = Array.from(
+          overlayRef.current?.querySelectorAll<HTMLElement>('button:not([disabled])') || [],
+        ).filter((control) => control.getClientRects().length > 0)
+        const firstControl = controls?.[0]
+        const lastControl = controls?.[controls.length - 1]
+
+        if (e.shiftKey && document.activeElement === firstControl) {
+          e.preventDefault()
+          lastControl?.focus()
+        } else if (!e.shiftKey && document.activeElement === lastControl) {
+          e.preventDefault()
+          firstControl?.focus()
+        }
       }
     },
-    [nextPictureIndex, firstPicture, lastPicture],
+    [nextPictureIndex, firstPicture, lastPicture, setGalleryCarousel],
   )
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+    document.body.style.overflow = 'hidden'
+    overlayRef.current?.querySelector<HTMLButtonElement>('[data-lightbox-close]')?.focus()
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      previouslyFocused?.focus()
+    }
+  }, [])
 
   useEffect(() => {
     if (nextPictureIndex === 0) {
@@ -123,18 +153,16 @@ const GalleryCarousel: React.FC<{
       return (
         <MoveBtn
           next={true}
+          label={t('post.nextPhoto')}
           stateChange={() => handleState(true)}
-          firstPicture={firstPicture}
-          lastPicture={lastPicture}
         />
       )
     } else if (lastPicture) {
       return (
         <MoveBtn
           next={false}
+          label={t('post.previousPhoto')}
           stateChange={() => handleState(false)}
-          firstPicture={firstPicture}
-          lastPicture={lastPicture}
         />
       )
     } else {
@@ -142,15 +170,13 @@ const GalleryCarousel: React.FC<{
         <>
           <MoveBtn
             next={true}
+            label={t('post.nextPhoto')}
             stateChange={() => handleState(true)}
-            firstPicture={firstPicture}
-            lastPicture={lastPicture}
           />
           <MoveBtn
             next={false}
+            label={t('post.previousPhoto')}
             stateChange={() => handleState(false)}
-            firstPicture={firstPicture}
-            lastPicture={lastPicture}
           />
         </>
       )
@@ -158,12 +184,21 @@ const GalleryCarousel: React.FC<{
   }
 
   return createPortal(
-    <StyledLargePicBackgorund src={images[nextPictureIndex].src} onClick={handleBackdropClick}>
+    <StyledLargePicBackgorund
+      ref={overlayRef}
+      src={images[nextPictureIndex].src}
+      role='dialog'
+      aria-modal='true'
+      aria-label={t('post.photoViewer')}
+      tabIndex={-1}
+      onClick={handleBackdropClick}
+    >
       <StyledCarouselWrapper onClick={handleBackdropClick}>
         <>{displayButtons(firstPicture, lastPicture)}</>
-        <CloseButton setGalleryCarousel={setGalleryCarousel} />
+        <CloseButton label={t('post.closePhoto')} setGalleryCarousel={setGalleryCarousel} />
         <LargePic
           src={images[nextPictureIndex].src}
+          alt={`${t('post.openPhoto')} ${nextPictureIndex + 1} ${t('post.photoOf')} ${images.length}`}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         />

@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import ArrowRight from '../ArrowRight'
 
-const StyledArrow = styled.div<{ mouseEnter: boolean }>`
+const StyledArrow = styled.div<{ $mouseEnter: boolean }>`
   position: absolute;
   bottom: 0.1rem;
   right: 1rem;
@@ -14,7 +14,7 @@ const StyledArrow = styled.div<{ mouseEnter: boolean }>`
   z-index: 5;
 
   transition: transform 150ms ease;
-  transform: ${(props) => (props.mouseEnter ? 'translateX(5px)' : 'translateX(0)')};
+  transform: ${(props) => (props.$mouseEnter ? 'translateX(5px)' : 'translateX(0)')};
 
   & > * {
     width: 30px;
@@ -24,7 +24,7 @@ const StyledArrow = styled.div<{ mouseEnter: boolean }>`
 
 const PostForwardArrow: React.FC<{ mouseEnter: boolean }> = ({ mouseEnter }) => {
   return (
-    <StyledArrow mouseEnter={mouseEnter}>
+    <StyledArrow $mouseEnter={mouseEnter}>
       <ArrowRight />
     </StyledArrow>
   )
