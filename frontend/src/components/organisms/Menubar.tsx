@@ -14,7 +14,7 @@ const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boo
   justify-content: space-between;
   width: ${({ $isScrolled }) => ($isScrolled ? 'calc(100% - 2.5rem)' : '100%')};
   height: ${({ $isScrolled }) => ($isScrolled ? '5.5rem' : '6.75rem')};
-  border-radius: ${({ $isScrolled }) => ($isScrolled ? '12px' : '0')};
+  border-radius: ${({ $isScrolled }) => ($isScrolled ? '5px' : '0')};
   padding: 0 clamp(1.25rem, 5vw, 5rem);
   background-color: ${({ $isScrolled, $mobileMenuOpen }) => {
     if ($mobileMenuOpen) return 'rgba(248, 247, 243, 0.98)'
@@ -51,7 +51,7 @@ const StyledMenubar = styled.header<{ $isScrolled: boolean; $mobileMenuOpen: boo
     z-index: 0;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(180deg, rgba(5, 8, 7, 0.38) 0%, rgba(5, 8, 7, 0.16) 68%, rgba(5, 8, 7, 0) 100%);
+    background: linear-gradient(180deg, rgba(5, 8, 7, 0.78) 0%, rgba(5, 8, 7, 0.36) 68%, rgba(5, 8, 7, 0) 100%);
     content: '';
     opacity: ${({ $isScrolled, $mobileMenuOpen }) => ($isScrolled || $mobileMenuOpen ? 0 : 1)};
     pointer-events: none;
