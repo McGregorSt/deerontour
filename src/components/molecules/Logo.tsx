@@ -22,8 +22,8 @@ const StyledWrapper = styled.div`
 const StyledLogo = styled.div<{ $large: boolean; $light: boolean }>`
   /* border: 2px solid red; */
   /* display: block; */
-  width: ${({ $large }) => ($large ? '9rem' : '5rem')};
-  height: ${({ $large }) => ($large ? '12rem' : '7rem')};
+  width: ${({ $large }) => ($large ? '10rem' : '7rem')};
+  height: ${({ $large }) => ($large ? '15rem' : '9rem')};
   background-image: url('/assets/logoDeer.png');
   background-size: contain;
   background-repeat: no-repeat;
