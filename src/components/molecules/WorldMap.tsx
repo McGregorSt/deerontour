@@ -5,41 +5,48 @@ import MapBackground from '../atoms/MapBackground'
 import { useI18n } from '../../i18n/I18nContext'
 import { TranslationKey } from '../../i18n/translations'
 
-const StyledWorldMap = styled.div`
-  position: relative;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
-  margin: auto;
-  left: -3%;
-  padding-bottom: 3rem;
-  width: 100%;
-  overflow-x: auto;
+const StyledWorldMap = styled.section`
+  padding: clamp(3.5rem, 8vw, 7rem) 0;
+  background: #eeede8;
 `
 
-const StyledDiv = styled.div`
-    width: 20px;
-    height: 20px;
-    border-radius: 1vh;
-    background-color: orangered;
-    margin: 10px;
-    position: absolute;
-    top: 50%;
-    left: 80.0187%;
-    opacity: 0.9;
+const StyledContent = styled.div`
+  width: min(calc(100% - clamp(1.25rem, 5.5vw, 5rem) * 2), 1440px);
+  margin: 0 auto;
+`
 
- 
-    
+const StyledHeading = styled.div`
+  h2 {
+    margin: 0;
+    font-family: 'Alumni Sans Pinstripe', Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  p {
+    max-width: 39rem;
+    margin: 0.8rem 0 0;
+    color: #77776f;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+`
+
+const StyledMap = styled.div`
+  width: min(100%, 1120px);
+  margin: clamp(1rem, 3vw, 2rem) auto 0;
 `
 
 export interface PointMap {
-  countryCode: string,
-  countryName: string,
-  countryKey: TranslationKey,
-  x: string,
-  y: string,
-  descriptionKey: TranslationKey,
+  countryCode: string
+  countryName: string
+  countryKey: TranslationKey
+  x: string
+  y: string
+  descriptionKey: TranslationKey
 }
+
 const mapPoints: PointMap[] = [
   {
     countryCode: 'vietnam',
@@ -59,24 +66,32 @@ const mapPoints: PointMap[] = [
   },
 ]
 
-
-const WorldMap: React.FC<{}> = () => {
+const WorldMap: React.FC = () => {
   const { t } = useI18n()
+
   return (
-    <StyledWorldMap>
-      <MapBackground>
-      {mapPoints.map((point: PointMap, index: number) => (
-        <MapPoint
-          key={`${point.countryCode}-${index}`}
-          countryCode={point.countryCode}
-          countryName={point.countryName}
-          country={t(point.countryKey)}
-          x={point.x}
-          y={point.y}
-          description={t(point.descriptionKey)}
-        />
-      ))}
-      </MapBackground>
+    <StyledWorldMap aria-labelledby='world-map-title'>
+      <StyledContent>
+        <StyledHeading>
+          <h2 id='world-map-title'>{t('home.mapTitle')}</h2>
+          <p>{t('home.mapDescription')}</p>
+        </StyledHeading>
+        <StyledMap>
+          <MapBackground>
+            {mapPoints.map((point) => (
+              <MapPoint
+                key={point.countryCode}
+                countryCode={point.countryCode}
+                countryName={point.countryName}
+                country={t(point.countryKey)}
+                x={point.x}
+                y={point.y}
+                description={t(point.descriptionKey)}
+              />
+            ))}
+          </MapBackground>
+        </StyledMap>
+      </StyledContent>
     </StyledWorldMap>
   )
 }

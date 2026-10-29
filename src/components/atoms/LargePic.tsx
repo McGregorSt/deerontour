@@ -14,10 +14,11 @@ const StyledLargePic = styled.img`
 
 const LargePic: React.FC<{
   src: string
+  alt: string
   onTouchStart: React.TouchEventHandler<HTMLImageElement>
   onTouchEnd: React.TouchEventHandler<HTMLImageElement>
-}> = ({ src, onTouchStart, onTouchEnd }) => (
-  <StyledLargePic src={src} alt='' onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} />
+}> = ({ src, alt, onTouchStart, onTouchEnd }) => (
+  <StyledLargePic src={src} alt={alt} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} />
 )
 
 export default LargePic

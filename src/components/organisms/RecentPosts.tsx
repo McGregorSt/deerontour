@@ -1,74 +1,73 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import PostCard from './PostCard'
 import { IPost } from '../../support/types'
-import Header from '../atoms/Header'
 import { fetchPosts } from '../../support/api'
 import { useI18n } from '../../i18n/I18nContext'
 import ArrowRight from '../atoms/ArrowRight'
 
+const StyledWrapper = styled.section`
+  width: min(calc(100% - clamp(1.25rem, 5.5vw, 5rem) * 2), 1440px);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(3.5rem, 8vw, 7rem);
+`
+
 const StyledHeader = styled.div`
-  /* padding: 0 1.5rem; */
+  margin-bottom: 0.5rem;
+
+  h2 {
+    margin: 0;
+    font-family: 'Alumni Sans Pinstripe', Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1;
+  }
 `
 
 const StyledPostsViewport = styled.div`
   position: relative;
 `
 
-const StyledWrapper = styled.div`
-  padding-top: 5rem;
-  width: calc(100% - 5rem);
-  margin-left: 5rem;
-  
-  @media (max-width: 768px) {
-    padding-top: 2.5rem;
-    width: calc(100% - 1rem);
-    margin-left: 1rem;
-  }
-`
-
 const StyledRecentPosts = styled.div`
-    padding: 2rem 1.5rem 3rem;
-    display: flex;
-    flex-direction: row;
-    gap: 3rem;
-    justify-content: flex-start;
-    overflow-x: auto;
-    white-space: nowrap;
-    align-items: stretch;
-    /* width: 80%; */
-    margin-right: 1rem;
-    
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    
-    @media (max-width: 768px) {
-      padding: 1rem 1rem 2rem;
-      flex-direction: row;
-      white-space: nowrap;
-      overflow-x: auto;
-      gap: 1rem;
-    }
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 2vw, 1.75rem);
+  overflow-x: auto;
+  padding: 1.25rem 0 1.75rem;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & > * {
+    scroll-snap-align: start;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
 `
 
 const StyledScrollButton = styled.button<{ $previous: boolean }>`
   position: absolute;
-  top: 100%;
-  ${({ $previous }) => ($previous ? 'left: 1.5rem;' : 'right: 1.5rem;')}
-  z-index: 991;
-  display: flex;
-  width: 3rem;
-  height: 3rem;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem;
-  border: 0;
+  top: -3.4rem;
+  ${({ $previous }) => ($previous ? 'right: 3.25rem;' : 'right: 0;')}
+  z-index: 1;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  padding: 0.55rem;
+  border: 1px solid #d5d4ce;
   border-radius: 50%;
-  background: rgba(253, 183, 30, 0.99);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  background: transparent;
+  color: #33342d;
   cursor: pointer;
-  transform: translateY(-50%);
+  transition: background-color 180ms ease, opacity 180ms ease;
 
   svg {
     width: 100%;
@@ -76,35 +75,56 @@ const StyledScrollButton = styled.button<{ $previous: boolean }>`
     ${({ $previous }) => $previous && 'transform: rotate(180deg);'}
   }
 
-  &:hover {
-    background: rgba(253, 183, 30, 0.7);
+  &:hover:not(:disabled) {
+    background: #e7e5df;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
   }
 
   &:focus-visible {
-    outline: 2px solid #555;
-    outline-offset: 2px;
+    outline: 2px solid #a33b2f;
+    outline-offset: 3px;
   }
 
-  @media (max-width: 768px) {
-    ${({ $previous }) => ($previous ? 'left: 0.75rem;' : 'right: 0.75rem;')}
+  @media (max-width: 600px) {
+    top: -3.15rem;
+    width: 2.15rem;
+    height: 2.15rem;
   }
+`
+
+const StyledMessage = styled.p`
+  color: #77776f;
 `
 
 const RecentPosts = () => {
   const { language, t } = useI18n()
-  // const location = useLocation()
   const [postsData, setPostsData] = useState<IPost[]>([])
   const [hasMorePosts, setHasMorePosts] = useState(false)
   const [hasPreviousPosts, setHasPreviousPosts] = useState(false)
-  const postsRef = React.useRef<HTMLDivElement>(null)
+  const [error, setError] = useState(false)
+  const postsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const loadPosts = async () => {
-      const posts = await fetchPosts(language)
-      setPostsData(posts)
-    }
+    let active = true
+    fetchPosts(language)
+      .then((posts) => {
+        if (active) {
+          setPostsData(posts)
+          setError(false)
+        }
+      })
+      .catch((fetchError: unknown) => {
+        console.error('Error fetching recent posts:', fetchError)
+        if (active) setError(true)
+      })
 
-    loadPosts()
+    return () => {
+      active = false
+    }
   }, [language])
 
   const updateScrollState = () => {
@@ -129,79 +149,43 @@ const RecentPosts = () => {
     }
   }
 
-  // const isHomepage = location.pathname === '/'
-
-  const sortedPostsByTime = [...postsData].sort((a: IPost, b: IPost) => {
-    const dateA = new Date(a.createdAt).getTime()
-    const dateB = new Date(b.createdAt).getTime()
-
-    return dateB - dateA
-  })
+  const sortedPostsByTime = [...postsData].sort(
+    (first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime(),
+  )
 
   return (
-    <>
-      {/* {isHomepage ? ( */}
-      <StyledWrapper>
-        <StyledHeader>
-          <Header content={t('home.recentPosts')} />
-        </StyledHeader>
-        {/* <StyledPosts> */}
+    <StyledWrapper aria-labelledby='recent-posts-title'>
+      <StyledHeader>
+        <h2 id='recent-posts-title'>{t('home.recentPosts')}</h2>
+      </StyledHeader>
+      {error ? (
+        <StyledMessage role='alert'>{t('home.recentPostsError')}</StyledMessage>
+      ) : (
         <StyledPostsViewport>
-          <StyledRecentPosts ref={postsRef} onScroll={updateScrollState}>
-            <>
-              {sortedPostsByTime.map(
-                (post: IPost, index: number) =>
-                  postsData && (
-                    <PostCard
-                      key={index}
-                      post={post}
-                    />
-                  ),
-              )}
-            </>
+          <StyledRecentPosts ref={postsRef} onScroll={updateScrollState} aria-label={t('home.recentPosts')}>
+            {sortedPostsByTime.map((post) => <PostCard key={post.id} post={post} />)}
           </StyledRecentPosts>
-          {hasPreviousPosts && (
-            <StyledScrollButton
-              type='button'
-              $previous
-              aria-label={t('home.scrollRecentPostsBack')}
-              onClick={() => scrollPosts('previous')}
-            >
-              <ArrowRight />
-            </StyledScrollButton>
-          )}
-          {hasMorePosts && (
-            <StyledScrollButton
-              type='button'
-              $previous={false}
-              aria-label={t('home.scrollRecentPosts')}
-              onClick={() => scrollPosts('next')}
-            >
-              <ArrowRight />
-            </StyledScrollButton>
-          )}
+          <StyledScrollButton
+            type='button'
+            $previous
+            aria-label={t('home.scrollRecentPostsBack')}
+            disabled={!hasPreviousPosts}
+            onClick={() => scrollPosts('previous')}
+          >
+            <ArrowRight />
+          </StyledScrollButton>
+          <StyledScrollButton
+            type='button'
+            $previous={false}
+            aria-label={t('home.scrollRecentPosts')}
+            disabled={!hasMorePosts}
+            onClick={() => scrollPosts('next')}
+          >
+            <ArrowRight />
+          </StyledScrollButton>
         </StyledPostsViewport>
-        {/* </StyledPosts> */}
-      </StyledWrapper>
-      {/* ) : (
-        <UserPage>
-          <Header content='Recent posts' />
-          <StyledRecentPosts>
-            <>
-              {postsData.map(
-                (post: IPost, index: number) =>
-                  postsData && (
-                    <PostCard
-                      key={index}
-                      post={post}
-                    />
-                  ),
-              )}
-            </>
-          </StyledRecentPosts>
-        </UserPage>
-      )} */}
-    </>
+      )}
+    </StyledWrapper>
   )
 }
 

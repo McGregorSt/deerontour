@@ -9,20 +9,23 @@ const StyledPostCardPhoto = styled.div`
   }
 `
 
-const PostCardPhoto: React.FC<{ imgSrc: {src: string}[][] }> = ({ imgSrc }) => {
-  // console.log('cardphoto', imgSrc[0][0].src)
-  // const imageUrl = typeof imgSrc === 'string' ? imgSrc : imgSrc[0]?.[0] ?? ''
-
-  const imageSrc = imgSrc && imgSrc.length > 0 && imgSrc[0].length > 0 ? imgSrc[0][0] : {src: ''}
+const PostCardPhoto: React.FC<{
+  imgSrc: { src: string }[][]
+  alt?: string
+  fallbackSrc?: string
+}> = ({ imgSrc, alt = '', fallbackSrc }) => {
+  const imageSrc = imgSrc && imgSrc.length > 0 && imgSrc[0].length > 0 ? imgSrc[0][0] : { src: '' }
 
   return (
     <StyledPostCardPhoto>
       <img
         src={imageSrc.src}
-        // src={`${process.env.PUBLIC_URL}${imgSrc}`}
-        alt='alt'
-        // width={200}
-        // height={200}
+        alt={alt}
+        onError={(event) => {
+          if (fallbackSrc && event.currentTarget.getAttribute('src') !== fallbackSrc) {
+            event.currentTarget.src = fallbackSrc
+          }
+        }}
       />
     </StyledPostCardPhoto>
   )

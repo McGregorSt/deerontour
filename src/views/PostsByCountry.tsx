@@ -10,10 +10,10 @@ import { IPost } from '../support/types'
 
 const StyledPostsPage = styled.main`
   width: 100%;
-  padding: 10rem 5rem 3rem;
+  padding: 3rem 5rem 3rem;
 
   @media (max-width: 768px) {
-    padding: 7rem 1rem 2rem;
+    padding: 2rem 1rem 2rem;
   }
 `
 

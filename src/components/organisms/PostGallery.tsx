@@ -12,10 +12,10 @@ const StyledGalleryGrid = styled.div<{ $imagesCount: number; $layout: GalleryLay
   width: 100%;
   height: ${({ $imagesCount, $layout }) => {
     if ($layout === 'split') return '22rem'
-    if ($imagesCount === 1) return 'clamp(24rem, 45vw, 38rem)'
-    if ($imagesCount === 2) return 'clamp(18rem, 30vw, 28rem)'
-    if ($imagesCount === 3) return 'clamp(14rem, 22vw, 20rem)'
-    return 'clamp(24rem, 38vw, 32rem)'
+    if ($imagesCount === 1) return 'clamp(13rem, 28vw, 22rem)'
+    if ($imagesCount === 2) return 'clamp(12rem, 22vw, 17rem)'
+    if ($imagesCount === 3) return 'clamp(11rem, 18vw, 14rem)'
+    return 'clamp(16rem, 28vw, 22rem)'
   }};
   display: grid;
   grid-template-columns: ${({ $imagesCount }) => {
@@ -26,7 +26,7 @@ const StyledGalleryGrid = styled.div<{ $imagesCount: number; $layout: GalleryLay
     return 'repeat(3, minmax(0, 1fr))'
   }};
   grid-template-rows: ${({ $imagesCount }) =>
-    $imagesCount === 4 ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)'};
+    $imagesCount >= 4 ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)'};
   gap: clamp(0.5rem, 1.2vw, 1rem);
   cursor: pointer;
 
@@ -41,9 +41,9 @@ const StyledGalleryGrid = styled.div<{ $imagesCount: number; $layout: GalleryLay
   @media (max-width: 768px) {
     height: ${({ $imagesCount, $layout }) => {
       if ($layout === 'split') return '18rem'
-      if ($imagesCount === 1) return '24rem'
-      if ($imagesCount === 2) return '18rem'
-      return '23rem'
+      if ($imagesCount === 1) return 'clamp(12rem, 56vw, 17rem)'
+      if ($imagesCount === 2) return 'clamp(11rem, 48vw, 14rem)'
+      return 'clamp(12rem, 58vw, 18rem)'
     }};
 
     grid-template-columns: ${({ $imagesCount }) =>
@@ -53,16 +53,14 @@ const StyledGalleryGrid = styled.div<{ $imagesCount: number; $layout: GalleryLay
   }
 `
 
-const StyledWrapper = styled.div<{ $layout: GalleryLayout; $widthFactor: number; $offsetPercent: number }>`
+const StyledWrapper = styled.div<{ $layout: GalleryLayout }>`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: ${({ $layout }) => ($layout === 'split' ? '0' : '2rem 0')};
-  width: ${({ $layout, $widthFactor }) =>
-    $layout === 'split' ? '100%' : `min(calc(100% * ${$widthFactor}), calc(100vw - 2rem))`};
-  margin-left: ${({ $layout }) => ($layout === 'split' ? '0' : '50%')};
-  transform: ${({ $layout, $offsetPercent }) =>
-    $layout === 'split' ? 'none' : `translateX(calc(-50% + ${$offsetPercent}%))`};
+  padding: ${({ $layout }) => ($layout === 'split' ? '0' : '0.5rem 0 1.5rem')};
+  width: 100%;
+  margin-left: 0;
+  transform: none;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -74,26 +72,16 @@ const StyledWrapper = styled.div<{ $layout: GalleryLayout; $widthFactor: number;
 const PostGallery: React.FC<{
   imagesArr: IImage[]
   imagesToDisplay: IImage[]
-  wide?: boolean
   layout?: GalleryLayout
-  widthFactor?: number
-  offsetPercent?: number
-}> = ({ imagesArr, imagesToDisplay, wide = false, layout, widthFactor, offsetPercent = 0 }) => {
+}> = ({ imagesArr, imagesToDisplay, layout }) => {
   if (!imagesToDisplay.length) {
     return null
   }
 
   const resolvedLayout = layout ?? 'wide'
-  const defaultWidthFactor =
-    imagesToDisplay.length === 1 ? 1.5 : imagesToDisplay.length === 2 ? 1.3 : imagesToDisplay.length === 3 ? 1.2 : 1.08
-
   return (
     <>
-      <StyledWrapper
-        $layout={resolvedLayout}
-        $widthFactor={widthFactor ?? defaultWidthFactor}
-        $offsetPercent={offsetPercent}
-      >
+      <StyledWrapper $layout={resolvedLayout}>
         <StyledGalleryGrid $imagesCount={imagesToDisplay.length} $layout={resolvedLayout}>
           {imagesToDisplay.map((image: IImage, index: number) => {
             const startPicIndex = imagesArr.flat().indexOf(imagesToDisplay[index])

@@ -1,257 +1,263 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { useParams } from 'react-router-dom'
 import PostCard from './PostCard'
 import { IPost } from '../../support/types'
-import { fetchCountriesByContinent, fetchPostsByContinentNoMock, ICountryOption } from '../../support/api'
-import countryCodeMap from '../../shared/countryCodeMap'
-import Header from '../atoms/Header'
+import { fetchPosts } from '../../support/api'
 import UserPage from '../../template/UserPage'
 import { useI18n } from '../../i18n/I18nContext'
 import { continentTranslationKeys } from '../../i18n/translations'
+import Continents from '../molecules/Continents'
 
-const StyledSelectedTours = styled.div`
-  width: 100%;
-  padding: 10rem 0 3rem 5rem;
+const continents = ['North America', 'South America', 'Europe', 'Africa', 'Asia', 'Australia']
 
-  @media (max-width: 768px) {
-    padding: 7rem 0 2rem 2rem;
-  }
+const StyledPage = styled.main`
+  flex: 1;
+  background: #f5f3ed;
+  color: #33342d;
 `
-const StyledWrapper = styled.div`
-  width: 100%;
-  padding: 2rem 1.5rem 3rem;
-  display: flex;
-  flex-direction: row;
-  gap: 3rem;
-  justify-content: flex-start;
-  overflow-x: auto;
-  white-space: nowrap;
-  align-items: stretch;
-  padding-right: 5rem;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+const StyledSection = styled.section`
+  width: min(100% - 3rem, 1200px);
+  margin: 0 auto;
+  padding: 3rem 0;
 
-  @media (max-width: 768px) {
-    padding: 1rem 1rem 2rem;
-    flex-direction: row;
-    white-space: nowrap;
-    overflow-x: auto;
-    gap: 2rem;
-  }
-
-  @media (max-width: 768px) {
+  @media (max-width: 700px) {
+    width: calc(100% - 2rem);
+    padding: 2rem 0;
   }
 `
 
-const StyledCountriesSection = styled.div`
-  width: 100%;
-  padding: 1.5rem 0 0;
+const StyledHeading = styled.div`
+  margin-bottom: 1.5rem;
+
+  & > span {
+    color: #a33b2f;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  & > h1,
+  & > h2 {
+    margin: 0.35rem 0 0;
+    font-family: 'Alumni Sans Pinstripe', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  & > p {
+    max-width: 36rem;
+    margin: 0.55rem 0 0;
+    color: #6f7069;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
 `
 
-const StyledCountriesList = styled.div`
+const StyledCountryFilters = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem 0 1rem 1.5rem;
-  /* margin-top: 0.5rem; */
+  gap: 0.6rem;
+  margin: 1rem 0 0;
 `
 
-const getCountryFlagUrl = (country: string) => {
-  const normalizedCountry = country.toLowerCase().trim()
-  const countryCode = countryCodeMap[normalizedCountry] || 'xx'
-
-  return `https://flagcdn.com/w80/${countryCode}.png`
-}
-
 const StyledCountryChip = styled.button<{ $active: boolean }>`
-  background: ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.897)' : 'rgba(124, 116, 91, 0.0)')};
-  border: 1px solid rgba(124, 116, 91, 0);
-  /* border-radius: 20px; */
-  padding: 1rem 1.8rem;
-  color: ${({ $active }) => ($active ? '#37342d' : '#37342d')};
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid ${({ $active }) => ($active ? '#a33b2f' : '#d8d5ca')};
+  border-radius: 999px;
+  background: ${({ $active }) => ($active ? '#a33b2f' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#fff' : '#45463f')};
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-width: 88px;
+  font: inherit;
+  font-size: 0.78rem;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 
   &:hover {
-    opacity: 0.95;
-    transform: translateY(-1px);
+    border-color: #a33b2f;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #33342d;
+    outline-offset: 3px;
   }
 `
 
-const StyledCountryFlag = styled.img`
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  border: 0.7rem solid rgba(255, 255, 255, 0.808);
-  object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.45);
+const StyledPostsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
 `
 
-const StyledCountryLabel = styled.span`
-  font-size: 0.8rem;
-  line-height: 1.2;
-  text-transform: capitalize;
+const StyledMessage = styled.p`
+  grid-column: 1 / -1;
+  margin: 1rem 0;
+  color: #6f7069;
   text-align: center;
 `
 
-const SelectedTours = () => {
-  const [postsData, setPostsData] = useState<IPost[]>([])
-  const [countries, setCountries] = useState<ICountryOption[]>([])
+const StyledError = styled(StyledMessage)`
+  color: #9c342a;
+`
+
+const SelectedTours: React.FC = () => {
+  const [allPosts, setAllPosts] = useState<IPost[]>([])
   const [activeCountries, setActiveCountries] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { continent } = useParams<{ continent: string }>()
   const { language, t } = useI18n()
+  const normalizedContinent = continent ? continent.toLowerCase() : ''
   const continentLabel = continent
-    ? t(continentTranslationKeys[continent.toLowerCase()] || 'tours.postsFrom')
+    ? t(continentTranslationKeys[normalizedContinent] || 'tours.postsFrom')
     : ''
 
   useEffect(() => {
-    const fetchToursData = async () => {
+    let active = true
+
+    const loadTours = async () => {
+      setLoading(true)
+      setError(null)
+      setAllPosts([])
+      setActiveCountries([])
       try {
-        setLoading(true)
-        setError(null)
-        if (!continent) {
-          setError('No continent provided')
-          setPostsData([])
-          setCountries([])
-          setActiveCountries([])
-          return
+        const posts = await fetchPosts(language)
+        if (active) setAllPosts(posts)
+      } catch (loadError) {
+        const message = loadError instanceof Error ? loadError.message : 'Failed to load tours'
+        console.error('Error fetching tours:', message)
+        if (active) {
+          setAllPosts([])
+          setError(message)
         }
-
-        const [fetchedPosts, fetchedCountries] = await Promise.all([
-          fetchPostsByContinentNoMock(continent, language),
-          fetchCountriesByContinent(continent, language),
-        ])
-
-        setPostsData(fetchedPosts || [])
-        setCountries(fetchedCountries || [])
-        setActiveCountries([])
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load tours'
-        console.error('Error fetching tours:', errorMessage)
-        setError(errorMessage)
-        setPostsData([])
-        setCountries([])
-        setActiveCountries([])
       } finally {
-        setLoading(false)
+        if (active) setLoading(false)
       }
     }
 
-    fetchToursData()
-  }, [continent, language])
+    loadTours()
+    return () => {
+      active = false
+    }
+  }, [language])
+
+  useEffect(() => {
+    setActiveCountries([])
+  }, [normalizedContinent])
+
+  const continentPosts = useMemo(
+    () => allPosts.filter((post) => post.continent.toLowerCase() === normalizedContinent),
+    [allPosts, normalizedContinent],
+  )
+
+  const countries = useMemo(() => {
+    const distinctCountries = new Map<string, string>()
+    continentPosts.forEach((post) => {
+      const key = post.country.toLowerCase()
+      if (!distinctCountries.has(key)) {
+        distinctCountries.set(key, post.countryLabel || post.country)
+      }
+    })
+    return Array.from(distinctCountries.entries())
+  }, [continentPosts])
 
   const toggleCountry = (country: string) => {
-    const normalizedCountry = country.toLowerCase()
-
-    setActiveCountries((current) => {
-      if (current.includes(normalizedCountry)) {
-        return current.filter((item) => item !== normalizedCountry)
-      }
-
-      return [...current, normalizedCountry]
-    })
+    setActiveCountries((current) => (
+      current.includes(country)
+        ? current.filter((item) => item !== country)
+        : [...current, country]
+    ))
   }
 
   const filteredPosts = activeCountries.length === 0
-    ? postsData
-    : postsData.filter((post) => activeCountries.includes(post.country.toLowerCase()))
+    ? continentPosts
+    : continentPosts.filter((post) => activeCountries.includes(post.country.toLowerCase()))
 
-  const sortedPostsByTime = [...filteredPosts].sort((a: IPost, b: IPost) => {
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
-  
-      return dateB - dateA
-    })
-
-  if (error) {
-    return (
-      <UserPage>
-        <StyledWrapper>
-          <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
-          <StyledSelectedTours>
-            <div style={{ gridColumn: '1 / -1', color: 'red', textAlign: 'center' }}>
-              {t(error === 'No continent provided' ? 'tours.noContinent' : 'tours.loadError')} {error !== 'No continent provided' && error}
-            </div>
-          </StyledSelectedTours>
-        </StyledWrapper>
-      </UserPage>
-    )
-  }
-
-  if (loading) {
-    return (
-      <UserPage>
-        <StyledWrapper>
-          <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
-          <StyledSelectedTours>
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>{t('tours.loading')}</div>
-          </StyledSelectedTours>
-        </StyledWrapper>
-      </UserPage>
-    )
-  }
+  const sortedPosts = useMemo(
+    () => [...filteredPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [filteredPosts],
+  )
+  const continentCounts = useMemo(
+    () => allPosts.reduce<Record<string, number>>((counts, post) => {
+      const key = post.continent.toLowerCase()
+      counts[key] = (counts[key] || 0) + 1
+      return counts
+    }, {}),
+    [allPosts],
+  )
+  const visibleContinents = continentCounts.antarctica
+    ? [...continents, 'Antarctica']
+    : continents
 
   return (
     <UserPage>
-      <StyledSelectedTours>
-        <StyledCountriesSection>
-          <Header content={t('tours.chooseCountry')} />
-          <StyledCountriesList>
-            {countries.length > 0 ? (
-              countries.map((country) => {
-                const normalizedCountry = country.code.toLowerCase()
-                const isActive = activeCountries.includes(normalizedCountry)
+      <StyledPage>
+        <StyledSection>
+          <StyledHeading>
+            <span>{t('tours.discoverEyebrow')}</span>
+            <h1>{t('tours.postsFrom')} {continentLabel}</h1>
+            <p>{t('tours.continentsDescription')}</p>
+          </StyledHeading>
+          <Continents continents={visibleContinents} counts={continentCounts} variant='tours' />
+        </StyledSection>
 
+        <StyledSection>
+          <StyledHeading>
+            <span>{t('tours.discoverEyebrow')}</span>
+            <h2>{t('tours.chooseCountry')}</h2>
+          </StyledHeading>
+          {!loading && !error && (
+            <StyledCountryFilters>
+              {countries.length ? countries.map(([code, label]) => {
+                const isActive = activeCountries.includes(code)
                 return (
                   <StyledCountryChip
-                    key={country.code}
+                    key={code}
                     type='button'
                     $active={isActive}
                     aria-pressed={isActive}
-                    onClick={() => toggleCountry(String(country.code))}
+                    onClick={() => toggleCountry(code)}
                   >
-                    <StyledCountryFlag
-                      src={getCountryFlagUrl(country.code)}
-                      alt={`${t('tours.flag')} ${country.label}`}
-                    />
-                    <StyledCountryLabel>{country.label}</StyledCountryLabel>
+                    {label}
                   </StyledCountryChip>
                 )
-              })
-            ) : (
-              <div style={{ color: '#5b594d' }}>{t('tours.noCountries')}</div>
-            )}
-          </StyledCountriesList>
-        </StyledCountriesSection>
-
-        <Header content={`${t('tours.postsFrom')} ${continentLabel}`} />
-        <StyledWrapper>
-          {filteredPosts && filteredPosts.length > 0 ? (
-            sortedPostsByTime.map((post: IPost, index: number) => (
-              <PostCard
-                key={index}
-                post={post}
-              />
-            ))
-          ) : (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-              {activeCountries.length > 0 ? t('tours.noSelectedTours') : t('tours.noTours')}
-            </div>
+              }) : <StyledMessage>{t('tours.noCountries')}</StyledMessage>}
+            </StyledCountryFilters>
           )}
-        </StyledWrapper>
-      </StyledSelectedTours>
+        </StyledSection>
+
+        <StyledSection>
+          <StyledHeading>
+            <span>{t('tours.popularEyebrow')}</span>
+            <h2>{t('tours.postsFrom')} {continentLabel}</h2>
+          </StyledHeading>
+          <StyledPostsGrid>
+            {loading ? (
+              <StyledMessage>{t('tours.loading')}</StyledMessage>
+            ) : error ? (
+              <StyledError>{t('tours.loadError')} {error}</StyledError>
+            ) : sortedPosts.length ? (
+              sortedPosts.map((post) => <PostCard key={post.id} post={post} variant='grid' />)
+            ) : (
+              <StyledMessage>
+                {activeCountries.length ? t('tours.noSelectedTours') : t('tours.noTours')}
+              </StyledMessage>
+            )}
+          </StyledPostsGrid>
+        </StyledSection>
+      </StyledPage>
     </UserPage>
   )
 }

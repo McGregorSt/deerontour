@@ -3,24 +3,55 @@ import styled, { css } from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
 
 const StyledToc = styled.aside`
-  width: min(100%, 320px);
-  background: rgba(250, 248, 243, 0.76);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(38, 38, 38, 0.12);
-  padding: 1.2rem 3rem 1rem;
-  box-shadow: 0 18px 45px rgba(16, 24, 40, 0.05);
+  width: 100%;
+  background: #fff;
+  border: 1px solid rgba(38, 38, 32, 0.1);
+  padding: 1.1rem 1rem;
   align-self: start;
-  border-radius: 5px;
+`
 
-  position: sticky;
-  top: calc(10vh + 2rem);
-  transform: translateX(max(-250px, calc(626px - 50vw)));
+const StyledMobileToc = styled.details`
+  display: none;
 
-  @media (max-width: 1080px) {
-    position: static !important;
-    width: 100%;
-    margin-bottom: 2rem;
-    transform: none;
+  @media (max-width: 768px) {
+    display: block;
+    margin: 0 0 1.5rem;
+    border-top: 1px solid rgba(38, 39, 32, 0.13);
+    border-bottom: 1px solid rgba(38, 39, 32, 0.13);
+
+    &[open] > summary::after {
+      transform: rotate(225deg);
+    }
+  }
+`
+
+const MobileTocSummary = styled.summary`
+  display: flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: space-between;
+  color: #333a3b;
+  cursor: pointer;
+  font-size: 0.92rem;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::after {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    content: '';
+    transform: rotate(45deg) translateY(-0.15rem);
+    transition: transform 160ms ease;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #a33b2f;
+    outline-offset: 3px;
   }
 `
 
@@ -38,6 +69,10 @@ const TocList = styled.ul`
   padding: 0;
   margin: 0;
   border-left: 1px solid rgba(34, 34, 34, 0.15);
+`
+
+const MobileTocList = styled(TocList)`
+  margin: 0 0 0.8rem;
 `
 
 const TocItem = styled.li`
@@ -60,11 +95,11 @@ const TocButton = styled.button<{ $active?: boolean }>`
   all: unset;
   cursor: pointer;
   display: grid;
-  grid-template-columns: 2.2rem minmax(0, 1fr);
+  grid-template-columns: 1.5rem minmax(0, 1fr);
   align-items: center;
   gap: 0.6rem;
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  padding: 0.45rem 0.5rem 0.45rem 0.8rem;
   color: rgba(28, 28, 28, 0.7);
   transition: color 0.2s ease, transform 0.2s ease;
   position: relative;
@@ -86,7 +121,11 @@ const TocButton = styled.button<{ $active?: boolean }>`
   &:hover,
   &:focus-visible {
     color: #1b1b1b;
-    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #a33b2f;
+    outline-offset: 1px;
   }
 
   ${(props) => props.$active && activeItemStyles}
@@ -102,7 +141,7 @@ const TocIndex = styled.span`
 
 const TocLabel = styled.span`
   display: block;
-  font-size: 0.92rem;
+  font-size: 0.8rem;
   line-height: 1.35;
   color: inherit;
 `
@@ -116,9 +155,15 @@ interface PostTableOfContentsProps {
   items: TocItemData[]
   activeId?: string
   onSelect?: (id: string) => void
+  variant?: 'sidebar' | 'inline'
 }
 
-const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, activeId, onSelect }) => {
+const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({
+  items,
+  activeId,
+  onSelect,
+  variant = 'sidebar',
+}) => {
   const { t } = useI18n()
   const handleClick = (id: string) => {
     if (onSelect) {
@@ -136,6 +181,24 @@ const PostTableOfContents: React.FC<PostTableOfContentsProps> = ({ items, active
 
   if (items.length === 0) {
     return null
+  }
+
+  if (variant === 'inline') {
+    return (
+      <StyledMobileToc>
+        <MobileTocSummary>{t('post.onThisPage')}</MobileTocSummary>
+        <MobileTocList>
+          {items.map((item, index) => (
+            <TocItem key={item.id}>
+              <TocButton type="button" $active={activeId === item.id} onClick={() => handleClick(item.id)}>
+                <TocIndex>{String(index + 1).padStart(2, '0')}</TocIndex>
+                <TocLabel>{item.title}</TocLabel>
+              </TocButton>
+            </TocItem>
+          ))}
+        </MobileTocList>
+      </StyledMobileToc>
+    )
   }
 
   return (
