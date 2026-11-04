@@ -51,6 +51,14 @@ const isValidParagraphs = (paragraphs) =>
       paragraph.paragraphText.every((text) => typeof text === 'string'),
   )
 
+const isValidMapData = (mapData) =>
+  mapData === undefined ||
+  mapData === null ||
+  (typeof mapData === 'object' &&
+    !Array.isArray(mapData) &&
+    Number.isFinite(mapData.x) &&
+    Number.isFinite(mapData.y))
+
 const listPosts = (req, res) => {
   const language = getLanguage(req, res)
   if (!language) return
@@ -189,8 +197,15 @@ exports.createPost = (req, res, next) => {
     creator,
     author,
     modifiedAt,
+    mapData,
     translations,
   } = req.body
+
+  if (!isValidMapData(mapData)) {
+    return res.status(400).json({
+      message: 'Pole mapData musi zawierać współrzędne liczbowe x oraz y',
+    })
+  }
 
   const supportedLanguages = ['EN', 'PL']
   if (
@@ -227,6 +242,7 @@ exports.createPost = (req, res, next) => {
           creator,
           author,
           modifiedAt,
+          mapData,
         },
         { transaction },
       )

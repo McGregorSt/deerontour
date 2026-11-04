@@ -25,6 +25,9 @@ app.get('/api/v1/posts', blogController.getPostByCountry)
 
 sequelize
   .sync()
+  .then(() =>
+    sequelize.query('ALTER TABLE posts ADD COLUMN IF NOT EXISTS map_data JSONB'),
+  )
   .then(() => {
     console.log('Baza zsynchronizowana!')
     app.listen(9090)

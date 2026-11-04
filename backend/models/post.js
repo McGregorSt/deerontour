@@ -33,6 +33,10 @@ const Post = sequelize.define('Post', {
     defaultValue: [],
     comment: 'Format: [[{ "src": "string" }]]'
   },
+  mapData: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+  },
   creator: {
     type: DataTypes.JSONB,
     allowNull: false,
