@@ -1,0 +1,14 @@
+{
+  "name": "deerontour",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n BACKEND,FRONTEND \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
+    "dev:backend": "npm run start --prefix backend",
+    "dev:frontend": "npm start --prefix frontend",
+    "build": "npm run build --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
