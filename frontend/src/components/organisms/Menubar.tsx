@@ -6,13 +6,13 @@ import { Language, TranslationKey } from '../../i18n/translations'
 import Logo from '../molecules/Logo'
 
 const StyledMenubar = styled.header<{
-  $isHome: boolean
+  $isHeroPage: boolean
   $isScrolled: boolean
   $mobileMenuOpen: boolean
 }>`
   position: fixed;
   inset: ${({ $isScrolled }) => ($isScrolled ? '0.75rem 1.25rem auto' : '0 0 auto')};
-  z-index: 1002;
+  z-index: 990;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,24 +20,19 @@ const StyledMenubar = styled.header<{
   height: ${({ $isScrolled }) => ($isScrolled ? '5.5rem' : '6.75rem')};
   border-radius: ${({ $isScrolled }) => ($isScrolled ? '50px' : '0')};
   padding: 0 clamp(1.25rem, 5vw, 5rem);
-  background-color: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => {
+  background-color: ${({ $isHeroPage, $isScrolled, $mobileMenuOpen }) => {
     if ($mobileMenuOpen) return 'rgba(248, 247, 243, 0.98)'
-    if ($isHome && !$isScrolled) return 'transparent'
+    if ($isHeroPage && !$isScrolled) return 'transparent'
     return $isScrolled ? 'rgba(250, 249, 246, 0.58)' : '#fff'
   }};
-  color: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => (
-    !$isHome || $isScrolled || $mobileMenuOpen ? '#262720' : '#fff'
-  )};
+  color: ${({ $isHeroPage, $isScrolled, $mobileMenuOpen }) =>
+    !$isHeroPage || $isScrolled || $mobileMenuOpen ? '#262720' : '#fff'};
   backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
   -webkit-backdrop-filter: ${({ $isScrolled }) => ($isScrolled ? 'blur(18px) saturate(180%)' : 'none')};
-  box-shadow: ${({ $isScrolled }) => (
-    $isScrolled
-      ? '0 8px 28px rgba(35, 37, 26, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65)'
-      : 'none'
-  )};
-  border-bottom: ${({ $isScrolled }) => (
-    $isScrolled ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent'
-  )};
+  box-shadow: ${({ $isScrolled }) =>
+    $isScrolled ? '0 8px 28px rgba(35, 37, 26, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65)' : 'none'};
+  border-bottom: ${({ $isScrolled }) =>
+    $isScrolled ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid transparent'};
   isolation: isolate;
   font-family: 'Montserrat', sans-serif;
   transition:
@@ -58,9 +53,8 @@ const StyledMenubar = styled.header<{
     border-radius: inherit;
     background: linear-gradient(180deg, rgba(5, 8, 7, 0.78) 0%, rgba(5, 8, 7, 0.36) 68%, rgba(5, 8, 7, 0) 100%);
     content: '';
-    opacity: ${({ $isHome, $isScrolled, $mobileMenuOpen }) => (
-      $isHome && !$isScrolled && !$mobileMenuOpen ? 1 : 0
-    )};
+    opacity: ${({ $isHeroPage, $isScrolled, $mobileMenuOpen }) =>
+      $isHeroPage && !$isScrolled && !$mobileMenuOpen ? 1 : 0};
     pointer-events: none;
     transition: opacity 300ms ease;
   }
@@ -87,13 +81,13 @@ const StyledMenubar = styled.header<{
   }
 `
 
-const StyledMenubarSpacer = styled.div<{ $isHome: boolean }>`
-  flex: 0 0 ${({ $isHome }) => ($isHome ? '0' : '6.75rem')};
-  height: ${({ $isHome }) => ($isHome ? '0' : '6.75rem')};
+const StyledMenubarSpacer = styled.div<{ $isHeroPage: boolean }>`
+  flex: 0 0 ${({ $isHeroPage }) => ($isHeroPage ? '0' : '6.75rem')};
+  height: ${({ $isHeroPage }) => ($isHeroPage ? '0' : '6.75rem')};
 
   @media (max-width: 1024px) {
-    flex-basis: ${({ $isHome }) => ($isHome ? '0' : '5rem')};
-    height: ${({ $isHome }) => ($isHome ? '0' : '5rem')};
+    flex-basis: ${({ $isHeroPage }) => ($isHeroPage ? '0' : '5rem')};
+    height: ${({ $isHeroPage }) => ($isHeroPage ? '0' : '5rem')};
   }
 `
 
@@ -108,10 +102,11 @@ const StyledBrand = styled.div<{ $post: boolean }>`
     gap: 0.35rem;
     color: inherit;
   }
-
+  
   & > div > a > div:first-child {
-    width: 3.25rem;
-    height: 3.5rem;
+    width: 3.75rem;
+    height: 4.5rem;
+    scale: 1.5;
   }
 
   & > div > a > div:last-child {
@@ -134,7 +129,9 @@ const StyledBrand = styled.div<{ $post: boolean }>`
   }
 
   @media (max-width: 1024px) {
-    ${({ $post }) => $post && `
+    ${({ $post }) =>
+      $post &&
+      `
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -514,8 +511,8 @@ const Menubar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(() => window.scrollY > 80)
   const toggleRef = useRef<HTMLButtonElement>(null)
-  const isHome = location.pathname === '/'
   const isPost = location.pathname.startsWith('/tours/details/')
+  const isHeroPage = location.pathname === '/' || location.pathname === '/tours' || isPost
   const isScrolled = hasScrolled
 
   useEffect(() => {
@@ -573,16 +570,16 @@ const Menubar: React.FC = () => {
   return (
     <>
       <StyledMenubar
-        $isHome={isHome}
+        $isHeroPage={isHeroPage}
         $isScrolled={isScrolled}
         $mobileMenuOpen={isMobileMenuOpen}
       >
         {isPost && <StyledPostBackLink to='/tours'>{t('nav.back')}</StyledPostBackLink>}
         <StyledBrand $post={isPost}>
           <Logo
-            large={false}
+            large={true}
             light={false}
-            lightText={isHome && !isScrolled && !isMobileMenuOpen}
+            lightText={isHeroPage && !isScrolled && !isMobileMenuOpen}
           />
         </StyledBrand>
         <StyledNav
@@ -610,10 +607,16 @@ const Menubar: React.FC = () => {
           aria-controls='primary-navigation'
           onClick={() => setIsMobileMenuOpen((open) => !open)}
         >
-          <StyledToggleIcon $isOpen={isMobileMenuOpen} aria-hidden='true' />
+          <StyledToggleIcon
+            $isOpen={isMobileMenuOpen}
+            aria-hidden='true'
+          />
         </StyledMobileMenuToggle>
       </StyledMenubar>
-      <StyledMenubarSpacer $isHome={isHome} aria-hidden='true' />
+      <StyledMenubarSpacer
+        $isHeroPage={isHeroPage}
+        aria-hidden='true'
+      />
     </>
   )
 }

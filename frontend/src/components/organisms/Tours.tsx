@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
 import { fetchPosts } from '../../support/api'
 import { IPost } from '../../support/types'
 import Continents from '../molecules/Continents'
+import CountryFilter from '../molecules/CountryFilter'
 import UserPage from '../../template/UserPage'
+import { normalizeContinent } from '../../shared/continent'
+import { filterPostsByLocation, getCountriesForPosts, normalizeCountry } from '../../shared/tourFilters'
 
 const heroImage = '/assets/6761b2f4d2ca643ca99c2d90/header.jpg'
 const continents = ['North America', 'South America', 'Europe', 'Africa', 'Asia', 'Australia']
@@ -19,23 +22,48 @@ const StyledPage = styled.main`
 const StyledHero = styled.section`
   position: relative;
   display: flex;
-  min-height: 25rem;
+  height: clamp(34rem, 72svh, 52rem);
   align-items: flex-end;
+  overflow: hidden;
   padding: 3rem max(7vw, calc((100vw - 1200px) / 2));
-  background-image: linear-gradient(90deg, rgba(20, 25, 22, 0.56), rgba(20, 25, 22, 0.05)),
-    linear-gradient(0deg, rgba(20, 25, 22, 0.3), transparent 70%), url('${heroImage}');
-  background-position: center 54%;
-  background-size: cover;
   color: white;
 
+  &::after {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(10, 15, 11, 0.62) 0%, rgba(10, 15, 11, 0.26) 52%, rgba(10, 15, 11, 0.02) 100%),
+      linear-gradient(0deg, rgba(10, 15, 11, 0.35), transparent 55%);
+    content: '';
+    pointer-events: none;
+  }
+
   @media (max-width: 700px) {
-    min-height: 14rem;
-    padding: 1.5rem 1.25rem 1.8rem;
-    background-position: center;
+    height: clamp(30rem, 72svh, 40rem);
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
+
+  @media (max-width: 430px) {
+    height: clamp(29rem, 70svh, 37rem);
+  }
+`
+
+const StyledHeroImage = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 54%;
+
+  @media (max-width: 700px) {
+    object-position: 54% center;
   }
 `
 
 const StyledHeroText = styled.div`
+  position: relative;
+  z-index: 1;
   max-width: 41rem;
 
   & > span {
@@ -119,6 +147,14 @@ const StyledSectionHeading = styled.div`
 
 const StyledPopularSection = styled(StyledSection)`
   padding-top: 0.5rem;
+`
+
+const StyledCountrySection = styled(StyledSection)`
+  scroll-margin-top: 7.5rem;
+
+  @media (max-width: 1024px) {
+    scroll-margin-top: 6rem;
+  }
 `
 
 const StyledTourGrid = styled.div`
@@ -316,9 +352,23 @@ const getDuration = (post: IPost) => {
 
 const Tours: React.FC = () => {
   const { language, t } = useI18n()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const selectedContinent = normalizeContinent(searchParams.get('continent') || '')
+  const selectedCountry = selectedContinent
+    ? normalizeCountry(searchParams.get('country') || '')
+    : ''
   const [posts, setPosts] = useState<IPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (selectedContinent) {
+      document.getElementById('tour-country-filter')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }, [selectedContinent])
 
   useEffect(() => {
     let active = true
@@ -349,7 +399,7 @@ const Tours: React.FC = () => {
 
   const continentCounts = useMemo(
     () => posts.reduce<Record<string, number>>((counts, post) => {
-      const key = post.continent.toLowerCase()
+      const key = normalizeContinent(post.continent)
       counts[key] = (counts[key] || 0) + 1
       return counts
     }, {}),
@@ -360,18 +410,69 @@ const Tours: React.FC = () => {
     ? [...continents, 'Antarctica']
     : continents
 
-  const popularPosts = useMemo(
-    () => [...posts].slice(0, 6),
-    [posts],
+  const continentPosts = useMemo(
+    () => selectedContinent
+      ? posts.filter((post) => normalizeContinent(post.continent) === selectedContinent)
+      : [],
+    [posts, selectedContinent],
   )
+
+  const availableCountries = useMemo(
+    () => getCountriesForPosts(continentPosts),
+    [continentPosts],
+  )
+
+  const filteredPosts = selectedContinent
+    ? filterPostsByLocation(posts, selectedContinent, selectedCountry)
+    : posts
+
+  const popularPosts = useMemo(
+    () => filteredPosts.slice(0, 6),
+    [filteredPosts],
+  )
+
+  const selectContinent = (continent: string) => {
+    const nextParams = new URLSearchParams(searchParams)
+    if (continent) {
+      nextParams.set('continent', continent)
+    } else {
+      nextParams.delete('continent')
+    }
+    nextParams.delete('country')
+    setSearchParams(nextParams)
+  }
+
+  const selectCountry = (country: string) => {
+    const nextParams = new URLSearchParams(searchParams)
+    if (country) {
+      nextParams.set('country', country)
+    } else {
+      nextParams.delete('country')
+    }
+    setSearchParams(nextParams)
+  }
+
+  useEffect(() => {
+    if (
+      !loading
+      && !error
+      && selectedCountry
+      && !availableCountries.some((country) => country.code === selectedCountry)
+    ) {
+      const nextParams = new URLSearchParams(searchParams)
+      nextParams.delete('country')
+      setSearchParams(nextParams, { replace: true })
+    }
+  }, [availableCountries, error, loading, searchParams, selectedCountry, setSearchParams])
 
   return (
     <UserPage>
       <StyledPage>
-        <StyledHero>
+        <StyledHero aria-labelledby='tours-title'>
+          <StyledHeroImage src={heroImage} alt='' fetchPriority='high' />
           <StyledHeroText>
             <span>{t('tours.heroEyebrow')}</span>
-            <h1>{t('nav.tours')}</h1>
+            <h1 id='tours-title'>{t('nav.tours')}</h1>
             <p>{t('tours.heroDescription')}</p>
           </StyledHeroText>
         </StyledHero>
@@ -382,8 +483,36 @@ const Tours: React.FC = () => {
             <h2>{t('tours.byContinents')}</h2>
             <p>{t('tours.continentsDescription')}</p>
           </StyledSectionHeading>
-          <Continents continents={visibleContinents} counts={continentCounts} variant='tours' />
+          <Continents
+            continents={visibleContinents}
+            counts={continentCounts}
+            variant='tours'
+            selectedContinent={selectedContinent}
+            onContinentSelect={selectContinent}
+          />
         </StyledSection>
+
+        {selectedContinent && (
+          <StyledCountrySection id='tour-country-filter'>
+            <StyledSectionHeading>
+              <span>{t('tours.discoverEyebrow')}</span>
+              <h2>{t('tours.chooseCountry')}</h2>
+            </StyledSectionHeading>
+            {!loading && !error && (
+              availableCountries.length ? (
+                <CountryFilter
+                  countries={availableCountries}
+                  selectedCountries={selectedCountry ? [selectedCountry] : []}
+                  onToggle={(country) => selectCountry(selectedCountry === country ? '' : country)}
+                  allCountriesLabel={t('tours.allCountries')}
+                  onSelectAll={() => selectCountry('')}
+                />
+              ) : (
+                <StyledLoadingMessage>{t('tours.noCountries')}</StyledLoadingMessage>
+              )
+            )}
+          </StyledCountrySection>
+        )}
 
         <StyledPopularSection id='popular-tours'>
           <StyledSectionHeading>

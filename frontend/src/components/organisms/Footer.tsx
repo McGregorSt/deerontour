@@ -10,6 +10,7 @@ const StyledFooter = styled.footer`
   padding: clamp(3.5rem, 6vw, 5.25rem) clamp(1.25rem, 5.5vw, 5rem) 3.5rem;
   border-top: 1px solid rgba(38, 39, 32, 0.1);
   background: #f1f0eb;
+  background: #F8F6F1;
   color: #33342d;
 
   @media (max-width: 600px) {
@@ -69,8 +70,50 @@ const StyledFooterContent = styled.div`
   }
 `
 
+const StyledCopyrightBar = styled.div`
+  display: flex;
+  width: min(100%, 1440px);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin: clamp(2rem, 4vw, 3.5rem) auto 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(38, 39, 32, 0.1);
+  /* background-color: white; */
+  color: #77776f;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  line-height: 1.5;
+
+  & > div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    text-align: right;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 0.9rem;
+    text-align: center;
+
+    & > div {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.45rem;
+      text-align: center;
+    }
+  }
+`
+
 const StyledLogo = styled.div`
   min-width: 0;
+  scale: 1.7;
+  transform-origin: left top;
 
   & > div > a {
     justify-content: flex-start;
@@ -103,6 +146,7 @@ const StyledLogo = styled.div`
   @media (max-width: 600px) {
     width: 100%;
     text-align: center;
+    transform-origin: center;
 
     & > div > a {
       justify-content: center;
@@ -127,7 +171,8 @@ const StyledLogo = styled.div`
 const StyledFooterNav = styled.nav`
   display: grid;
   justify-items: start;
-  align-content: start;
+  margin-left: 5rem;
+  /* align-content: center; */
 
   a {
     display: inline-flex;
@@ -303,7 +348,7 @@ const Footer = () => {
     <StyledFooter>
       <StyledFooterContent>
         <StyledLogo>
-          <Logo large={false} />
+          <Logo large={true} />
         </StyledLogo>
         <StyledFooterNav aria-label={t('nav.footerLabel')}>
           {menuItems.map((item) => (
@@ -316,6 +361,14 @@ const Footer = () => {
           <EmailSubscription title='' date='' />
         </StyledNewsletter>
       </StyledFooterContent>
+      <StyledCopyrightBar>
+        <span>© 2026 Deer On Tour. All rights reserved.</span>
+        <div>
+          <span>Designed for DOT</span>
+          <span aria-hidden='true'>·</span>
+          <span>Powered by G</span>
+        </div>
+      </StyledCopyrightBar>
     </StyledFooter>
   )
 }

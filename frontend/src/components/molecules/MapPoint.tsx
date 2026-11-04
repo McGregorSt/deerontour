@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
 
 interface MapPointProps {
   countryCode: string
   countryName: string
+  continent: string
+  countrySlug: string
   country: string
   x: string
   y: string
-  description: string
+  description?: string
 }
 
 const StyledPoint = styled.div<{ $x: string; $y: string }>`
@@ -116,22 +118,24 @@ const StyledCountryLink = styled(Link)`
   }
 `
 
-const MapPoint: React.FC<MapPointProps> = ({ countryCode, countryName, country, x, y, description }) => {
+const MapPoint: React.FC<MapPointProps> = ({
+  countryCode,
+  countryName,
+  continent,
+  countrySlug,
+  country,
+  x,
+  y,
+  description,
+}) => {
   const { t } = useI18n()
-  const navigate = useNavigate()
-  const [isOpen, setIsOpen] = useState(false)
-  const countryPostsPath = `/posts?country=${encodeURIComponent(countryName)}`
+  const [isHovered, setIsHovered] = useState(false)
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const isPopupVisible = isHovered || isDetailsOpen
+  const countryPostsPath = `/tours?continent=${encodeURIComponent(continent)}&country=${encodeURIComponent(countrySlug)}`
 
   const handleMarkerClick = () => {
-    const supportsHover = typeof window.matchMedia === 'function'
-      && window.matchMedia('(hover: hover) and (pointer: fine)').matches
-
-    if (supportsHover) {
-      navigate(countryPostsPath)
-      return
-    }
-
-    setIsOpen((open) => !open)
+    setIsDetailsOpen((open) => !open)
   }
 
   return (
@@ -139,31 +143,38 @@ const MapPoint: React.FC<MapPointProps> = ({ countryCode, countryName, country, 
       $x={x}
       $y={y}
       data-country={countryCode}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-      onFocus={() => setIsOpen(true)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsOpen(false)
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsHovered(false)
+          setIsDetailsOpen(false)
+        }
       }}
     >
       <StyledMarker
         type='button'
         aria-label={country}
-        aria-expanded={isOpen}
+        aria-expanded={isDetailsOpen}
         aria-controls={`map-country-${countryCode}`}
         title={country}
         onClick={handleMarkerClick}
       />
       <StyledPopup
         id={`map-country-${countryCode}`}
-        $visible={isOpen}
+        $visible={isPopupVisible}
         $alignRight={Number.parseFloat(x) > 60}
       >
         <h3>{country}</h3>
-        <p>{description}</p>
-        <StyledCountryLink to={countryPostsPath}>
-          {t('home.viewCountryPosts')} <span aria-hidden='true'>→</span>
-        </StyledCountryLink>
+        {isDetailsOpen && (
+          <>
+            {description && <p>{description}</p>}
+            <StyledCountryLink to={countryPostsPath}>
+              {t('home.viewCountryPosts')} <span aria-hidden='true'>→</span>
+            </StyledCountryLink>
+          </>
+        )}
       </StyledPopup>
     </StyledPoint>
   )

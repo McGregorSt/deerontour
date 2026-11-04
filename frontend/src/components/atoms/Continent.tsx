@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { useI18n } from '../../i18n/I18nContext'
+import { normalizeContinent } from '../../shared/continent'
 
 const StyledContinent = styled(Link)<{ $active: boolean; $variant: 'default' | 'tours' }>`
   display: flex;
@@ -74,27 +75,43 @@ const Continent: React.FC<{
   imageSrc: string
   count?: number
   variant?: 'default' | 'tours'
+  selectedContinent?: string | null
+  onSelect?: (continent: string) => void
 }> = ({
   continent,
   label,
   imageSrc,
   count,
   variant = 'default',
+  selectedContinent,
+  onSelect,
 }) => {
   const { pathname } = useLocation()
   const { t, language } = useI18n()
   const routeContinent = pathname.startsWith('/tours/continent/')
     ? decodeURIComponent(pathname.split('/').pop() || '').toLowerCase()
     : ''
-  const normalizedContinent = continent.toLowerCase()
-  const isActive = routeContinent === normalizedContinent
+  const normalizedContinent = normalizeContinent(continent)
+  const isControlled = selectedContinent !== undefined
+  const isActive = isControlled
+    ? normalizeContinent(selectedContinent || '') === normalizedContinent
+    : normalizeContinent(routeContinent) === normalizedContinent
+  const destination = variant === 'default'
+    ? `/tours?continent=${encodeURIComponent(normalizedContinent)}`
+    : `/tours/continent/${encodeURIComponent(continent.toLowerCase())}`
 
   return (
     <StyledContinent
-      to={`/tours/continent/${encodeURIComponent(normalizedContinent)}`}
+      to={destination}
       $active={isActive}
       $variant={variant}
       aria-current={isActive ? 'page' : undefined}
+      onClick={(event) => {
+        if (onSelect) {
+          event.preventDefault()
+          onSelect(isActive ? '' : normalizedContinent)
+        }
+      }}
     >
       <StyledContinentImage src={imageSrc} alt='' loading='lazy' $variant={variant} />
       <span>{label || continent}</span>

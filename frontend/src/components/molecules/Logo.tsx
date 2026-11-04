@@ -54,7 +54,7 @@ const StyledNameWrapper = styled.div`
 const StyledName = styled.div<{ $light: boolean }>`
   /* width: 10vw; */
   font-family: 'underground', sans-serif;
-  color: ${({ $light }) => ($light ? '#fff' : '#23251a')};
+  color: ${({ $light }) => ($light ? '#eeede8' : '#23251a')};
   font-size: 1.9rem;
   letter-spacing: 0.1rem;
   transition: color 300ms ease;
@@ -79,9 +79,10 @@ const StyledDesc = styled.div<{ $light: boolean }>`
   letter-spacing: 0.4rem;
   font-weight: 100;
   transition: color 300ms ease;
-
+  
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+    font-weight: 400;
   }
   /* transform: scaleX(1.1);
   transform-origin: left; */

@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { IPost } from '../../support/types'
 import PostParagraph from '../atoms/Post/PostParagraph'
 import PostGallery, { IImage } from './PostGallery'
+import PostPhotoGallery from './PostPhotoGallery'
 import PostTableOfContents from '../molecules/PostTableOfContents'
 import { fetchPostByCountry } from '../../support/api'
 import { useI18n } from '../../i18n/I18nContext'
@@ -19,35 +20,41 @@ const StyledPostWrapper = styled.div`
 
 const HeroSection = styled.header`
   position: relative;
-  width: min(calc(100% - 3rem), 1440px);
-  min-height: clamp(24rem, 42vw, 38rem);
+  isolation: isolate;
+  width: 100%;
+  height: clamp(34rem, 72svh, 52rem);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  margin: 0 auto;
-  padding: 2rem clamp(1rem, 3vw, 3rem) 3rem;
+  margin: 0;
+  padding: 8rem clamp(1.25rem, 7vw, 7rem) 4rem;
   color: #f5f0ea;
 
+  &::after {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(10, 15, 11, 0.58) 0%, rgba(10, 15, 11, 0.2) 58%, rgba(10, 15, 11, 0.02) 100%),
+      linear-gradient(0deg, rgba(10, 15, 11, 0.55), transparent 68%);
+    content: '';
+    pointer-events: none;
+  }
+
   @media (max-width: 768px) {
-    width: calc(100% - 2rem);
-    min-height: 0;
-    height: auto;
-    flex-direction: column;
-    align-items: stretch;
-    padding: clamp(11rem, 48vw, 14rem) 1.25rem 1rem;
-    color: #252a2b;
+    height: clamp(30rem, 68svh, 40rem);
+    padding: 7rem 1.25rem 2.5rem;
   }
 `
 
-const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: number }>`
+const HeroImage = styled.img<{ $scrollProgress: number }>`
   position: absolute;
+  z-index: 0;
   inset: -3% -1% -1%;
-  background-image:
-    linear-gradient(180deg, rgba(15, 18, 20, 0.08) 0%, rgba(15, 18, 20, 0.55) 100%),
-    url(${(props) => props.$backgroundImage});
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  width: 102%;
+  height: 104%;
+  object-fit: cover;
+  object-position: center;
   transform: translate3d(0, ${(props) => props.$scrollProgress * 56}px, 0)
     scale(${(props) => 1.08 + props.$scrollProgress * 0.04});
   will-change: transform;
@@ -58,16 +65,18 @@ const HeroBackground = styled.div<{ $backgroundImage: string; $scrollProgress: n
   }
 
   @media (max-width: 768px) {
-    inset: 0 0 auto;
-    height: clamp(11rem, 48vw, 14rem);
-    background-image: url(${(props) => props.$backgroundImage});
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-position: center 54%;
     transform: none;
+    will-change: auto;
   }
 `
 
 const HeroInner = styled.div<{ $scrollProgress: number }>`
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: min(100%, 1280px);
   margin: 0 auto;
   display: flex;
@@ -107,11 +116,11 @@ const HeroKicker = styled.p`
 const MobileByline = styled.p`
   display: none;
   margin: 0;
-  color: #5b6060;
+  color: rgba(245, 240, 234, 0.82);
   font-size: 0.75rem;
 
   span {
-    color: #343a3b;
+    color: #f5f0ea;
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -124,16 +133,15 @@ const MobileByline = styled.p`
 const HeroTitle = styled.h1`
   margin: 0;
   max-width: 780px;
-  font-size: clamp(3rem, 5.2vw, 5.5rem);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
   line-height: 0.94;
   letter-spacing: -0.025em;
   font-family: Georgia, serif;
   font-weight: 400;
 
   @media (max-width: 768px) {
-    color: #252a2b;
-    font-size: clamp(1.9rem, 8vw, 2.35rem);
-    line-height: 1.1;
+    font-size: clamp(2rem, 8vw, 3rem);
+    line-height: 1;
   }
 `
 
@@ -157,7 +165,7 @@ const MobileMeta = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 0.7rem;
-    color: #4c504f;
+    color: rgba(245, 240, 234, 0.92);
     font-size: 0.63rem;
     letter-spacing: 0.11em;
   }
@@ -166,7 +174,7 @@ const MobileMeta = styled.div`
 const MobileSubtitle = styled.p`
   display: none;
   margin: 0.35rem 0 0.75rem;
-  color: #495052;
+  color: rgba(245, 240, 234, 0.92);
   font-size: 1rem;
   line-height: 1.4;
 
@@ -270,6 +278,7 @@ const TripDetails = styled.section`
   padding: 1.1rem 1.2rem;
   border: 1px solid rgba(38, 39, 32, 0.1);
   background: rgba(255, 255, 255, 0.48);
+  background: #F8F6F1;
 `
 
 const TripDetailsTitle = styled.h2`
@@ -435,6 +444,20 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   const postGalleryFlat = useMemo(() => galleryGroups.flat(), [galleryGroups])
 
   const heroImage = post?.hero?.backgroundImage || post?.imageUrl || postGalleryFlat[0]?.src || ''
+  const articleImages = useMemo(() => {
+    const seen = new Set<string>()
+    return postGalleryFlat.reduce<IImage[]>((images, image) => {
+      const src = image.src?.trim()
+      const key = src && /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(src)
+        ? src
+        : src && `/${src.replace(/^\/+/, '')}`
+      if (src && key && !seen.has(key)) {
+        seen.add(key)
+        images.push({ src })
+      }
+      return images
+    }, [])
+  }, [postGalleryFlat])
 
   useEffect(() => {
     if (initialPost) {
@@ -598,16 +621,15 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
   return (
     <StyledPostWrapper>
       <HeroSection ref={heroRef}>
-        <HeroBackground
-          $backgroundImage={heroImage}
-          $scrollProgress={heroScrollProgress}
-        />
+        {heroImage && <HeroImage src={heroImage} alt='' $scrollProgress={heroScrollProgress} />}
         <HeroInner $scrollProgress={heroScrollProgress}>
           <HeroKicker>
             {continentLabel.toUpperCase()} · {(post.countryLabel || post.country).toUpperCase()}
           </HeroKicker>
           <MobileMeta>
             <span>{continentLabel.toUpperCase()}</span>
+            <span>·</span>
+            <span>{(post.countryLabel || post.country).toUpperCase()}</span>
             <span>·</span>
             <span>{dateLabel}</span>
             <span>·</span>
@@ -763,6 +785,7 @@ const Post: React.FC<{ post?: IPost }> = ({ post: initialPost }) => {
           </ArticleContent>
         </ArticleLayout>
       </StyledPostContainer>
+      <PostPhotoGallery images={articleImages} />
     </StyledPostWrapper>
   )
 }

@@ -19,6 +19,11 @@ export interface IPostTranslation {
   }
 }
 
+export interface IMapData {
+  x: number | string
+  y: number | string
+}
+
 export interface IPost {
   // W Postgresie używamy 'id' zamiast '_id'
   id: string; 
@@ -28,6 +33,7 @@ export interface IPost {
   country: string;
   countryLabel?: string;
   continent: string;
+  mapData?: IMapData | null;
   
   // Sequelize zwraca daty jako obiekty Date
   tourStart: Date; 

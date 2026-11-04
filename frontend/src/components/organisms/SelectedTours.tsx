@@ -8,6 +8,9 @@ import UserPage from '../../template/UserPage'
 import { useI18n } from '../../i18n/I18nContext'
 import { continentTranslationKeys } from '../../i18n/translations'
 import Continents from '../molecules/Continents'
+import { normalizeContinent } from '../../shared/continent'
+import CountryFilter from '../molecules/CountryFilter'
+import { filterPostsByCountries, getCountriesForPosts } from '../../shared/tourFilters'
 
 const continents = ['North America', 'South America', 'Europe', 'Africa', 'Asia', 'Australia']
 
@@ -57,35 +60,6 @@ const StyledHeading = styled.div`
   }
 `
 
-const StyledCountryFilters = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 1rem 0 0;
-`
-
-const StyledCountryChip = styled.button<{ $active: boolean }>`
-  min-height: 2.5rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid ${({ $active }) => ($active ? '#a33b2f' : '#d8d5ca')};
-  border-radius: 999px;
-  background: ${({ $active }) => ($active ? '#a33b2f' : 'transparent')};
-  color: ${({ $active }) => ($active ? '#fff' : '#45463f')};
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.78rem;
-  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
-
-  &:hover {
-    border-color: #a33b2f;
-  }
-
-  &:focus-visible {
-    outline: 2px solid #33342d;
-    outline-offset: 3px;
-  }
-`
-
 const StyledPostsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -119,7 +93,7 @@ const SelectedTours: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const { continent } = useParams<{ continent: string }>()
   const { language, t } = useI18n()
-  const normalizedContinent = continent ? continent.toLowerCase() : ''
+  const normalizedContinent = continent ? normalizeContinent(continent) : ''
   const continentLabel = continent
     ? t(continentTranslationKeys[normalizedContinent] || 'tours.postsFrom')
     : ''
@@ -158,19 +132,12 @@ const SelectedTours: React.FC = () => {
   }, [normalizedContinent])
 
   const continentPosts = useMemo(
-    () => allPosts.filter((post) => post.continent.toLowerCase() === normalizedContinent),
+    () => allPosts.filter((post) => normalizeContinent(post.continent) === normalizedContinent),
     [allPosts, normalizedContinent],
   )
 
   const countries = useMemo(() => {
-    const distinctCountries = new Map<string, string>()
-    continentPosts.forEach((post) => {
-      const key = post.country.toLowerCase()
-      if (!distinctCountries.has(key)) {
-        distinctCountries.set(key, post.countryLabel || post.country)
-      }
-    })
-    return Array.from(distinctCountries.entries())
+    return getCountriesForPosts(continentPosts)
   }, [continentPosts])
 
   const toggleCountry = (country: string) => {
@@ -181,9 +148,7 @@ const SelectedTours: React.FC = () => {
     ))
   }
 
-  const filteredPosts = activeCountries.length === 0
-    ? continentPosts
-    : continentPosts.filter((post) => activeCountries.includes(post.country.toLowerCase()))
+  const filteredPosts = filterPostsByCountries(continentPosts, activeCountries)
 
   const sortedPosts = useMemo(
     () => [...filteredPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
@@ -191,7 +156,7 @@ const SelectedTours: React.FC = () => {
   )
   const continentCounts = useMemo(
     () => allPosts.reduce<Record<string, number>>((counts, post) => {
-      const key = post.continent.toLowerCase()
+      const key = normalizeContinent(post.continent)
       counts[key] = (counts[key] || 0) + 1
       return counts
     }, {}),
@@ -207,7 +172,7 @@ const SelectedTours: React.FC = () => {
         <StyledSection>
           <StyledHeading>
             <span>{t('tours.discoverEyebrow')}</span>
-            <h1>{t('tours.postsFrom')} {continentLabel}</h1>
+            <h1>{t('home.continentsTitle')}</h1>
             <p>{t('tours.continentsDescription')}</p>
           </StyledHeading>
           <Continents continents={visibleContinents} counts={continentCounts} variant='tours' />
@@ -219,22 +184,9 @@ const SelectedTours: React.FC = () => {
             <h2>{t('tours.chooseCountry')}</h2>
           </StyledHeading>
           {!loading && !error && (
-            <StyledCountryFilters>
-              {countries.length ? countries.map(([code, label]) => {
-                const isActive = activeCountries.includes(code)
-                return (
-                  <StyledCountryChip
-                    key={code}
-                    type='button'
-                    $active={isActive}
-                    aria-pressed={isActive}
-                    onClick={() => toggleCountry(code)}
-                  >
-                    {label}
-                  </StyledCountryChip>
-                )
-              }) : <StyledMessage>{t('tours.noCountries')}</StyledMessage>}
-            </StyledCountryFilters>
+            countries.length
+              ? <CountryFilter countries={countries} selectedCountries={activeCountries} onToggle={toggleCountry} />
+              : <StyledMessage>{t('tours.noCountries')}</StyledMessage>
           )}
         </StyledSection>
 

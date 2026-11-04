@@ -25,8 +25,20 @@ test('renders navigation and the mobile menu toggle', () => {
   expect(screen.getByRole('button', { name: /open navigation menu/i })).toHaveAttribute('aria-expanded', 'false')
 })
 
-test('uses a solid header and reserves its layout space on internal pages', () => {
+test('uses the homepage hero navbar treatment on the tours landing page', () => {
   renderMenubar('/tours')
+
+  const header = screen.getByRole('banner')
+  const styles = window.getComputedStyle(header)
+
+  expect(styles.position).toBe('fixed')
+  expect(styles.backgroundColor).toBe('rgba(0, 0, 0, 0)')
+  expect(header.nextElementSibling).toHaveStyle({ height: '0' })
+  expect(screen.getByRole('button', { name: /open navigation menu/i })).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('uses a solid header and reserves its layout space on other internal pages', () => {
+  renderMenubar('/contact')
 
   const header = screen.getByRole('banner')
   const styles = window.getComputedStyle(header)
@@ -41,6 +53,10 @@ test('shows a contextual back link on individual posts', () => {
   renderMenubar('/tours/details/iceland')
 
   expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute('href', '/tours')
+
+  const header = screen.getByRole('banner')
+  expect(window.getComputedStyle(header).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+  expect(header.nextElementSibling).toHaveStyle({ height: '0' })
 })
 
 test('opens the mobile menu and locks background scrolling', async () => {

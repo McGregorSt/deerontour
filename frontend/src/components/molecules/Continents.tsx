@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Continent from '../atoms/Continent'
 import { useI18n } from '../../i18n/I18nContext'
 import { continentTranslationKeys } from '../../i18n/translations'
+import { normalizeContinent } from '../../shared/continent'
 
 const StyledContinents = styled.div<{ $variant: 'default' | 'tours' }>`
   display: grid;
@@ -41,7 +42,9 @@ const Continents: React.FC<{
   continents: string[]
   counts?: Record<string, number>
   variant?: 'default' | 'tours'
-}> = ({ continents, counts, variant = 'default' }) => {
+  selectedContinent?: string | null
+  onContinentSelect?: (continent: string) => void
+}> = ({ continents, counts, variant = 'default', selectedContinent, onContinentSelect }) => {
   const { t } = useI18n()
 
   return (
@@ -59,8 +62,10 @@ const Continents: React.FC<{
                   : continent
               }
               imageSrc={getContinentImageSrc(continent)}
-              count={counts ? counts[continent.toLowerCase()] ?? 0 : undefined}
+              count={counts ? counts[normalizeContinent(continent)] ?? 0 : undefined}
               variant={variant}
+              selectedContinent={selectedContinent}
+              onSelect={onContinentSelect}
             />
           </div>
         ))}

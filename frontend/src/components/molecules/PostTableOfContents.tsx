@@ -5,6 +5,8 @@ import { useI18n } from '../../i18n/I18nContext'
 const StyledToc = styled.aside`
   width: 100%;
   background: #fff;
+  background: #F8F6F1;
+  
   border: 1px solid rgba(38, 38, 32, 0.1);
   padding: 1.1rem 1rem;
   align-self: start;
