@@ -35,6 +35,35 @@ export interface ICountryOption {
   label: string
 }
 
+export interface INewsletterSubscriptionResponse {
+  status: number
+  message?: string
+}
+
+export const subscribeToNewsletter = async (
+  email: string,
+): Promise<INewsletterSubscriptionResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/newsletter/subscribe`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  })
+
+  const contentType = response.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    throw new Error('Newsletter API returned a non-JSON response')
+  }
+
+  const data: { message?: unknown } = await response.json()
+  return {
+    status: response.status,
+    message: typeof data.message === 'string' ? data.message : undefined,
+  }
+}
+
 const getJson = async <T>(url: string, fallback: T): Promise<T> => {
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {

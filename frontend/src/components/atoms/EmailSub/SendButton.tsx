@@ -35,9 +35,13 @@ const StyledSendButton = styled.button`
   }
 `
 
-const SendButton: React.FC = () => {
+const SendButton: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { t } = useI18n()
-  return <StyledSendButton>{t('newsletter.submit')}</StyledSendButton>
+  return (
+    <StyledSendButton type='submit' disabled={disabled}>
+      {t('newsletter.submit')}
+    </StyledSendButton>
+  )
 }
 
 export default SendButton

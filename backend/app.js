@@ -5,6 +5,7 @@ require('./models/postTranslation')
 const bodyParser = require('body-parser')
 
 const blogRoutes = require('./routes/blog')
+const newsletterRoutes = require('./routes/newsletter')
 const blogController = require('./controllers/blog')
 
 const app = express()
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/blog', blogRoutes)
+app.use('/api/v1/newsletter', newsletterRoutes)
 app.get('/api/v1/posts', blogController.getPostByCountry)
 
 sequelize

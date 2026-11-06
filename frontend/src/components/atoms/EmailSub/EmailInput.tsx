@@ -38,9 +38,27 @@ const StyledEmailInput = styled.input`
   }
 `
 
-const EmailInput: React.FC = () => {
+interface EmailInputProps {
+  value: string
+  disabled: boolean
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+const EmailInput: React.FC<EmailInputProps> = ({ value, disabled, onChange }) => {
   const { t } = useI18n()
-  return <StyledEmailInput placeholder={t('newsletter.emailPlaceholder')} />
+  return (
+    <StyledEmailInput
+      type='email'
+      name='email'
+      autoComplete='email'
+      aria-label={t('newsletter.emailLabel')}
+      aria-describedby='newsletter-feedback'
+      placeholder={t('newsletter.emailPlaceholder')}
+      value={value}
+      disabled={disabled}
+      onChange={onChange}
+    />
+  )
 }
 
 export default EmailInput
