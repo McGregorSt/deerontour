@@ -1,3 +1,5 @@
+require('dotenv').config({ path: __dirname + '/.env' });
+
 const express = require('express')
 const sequelize = require('./util/database') // Twoje połączenie
 const Post = require('./models/post') // Importujesz JUŻ ZDEFINIOWANY model
@@ -32,6 +34,6 @@ sequelize
   )
   .then(() => {
     console.log('Baza zsynchronizowana!')
-    app.listen(9090)
+    app.listen(process.env.PORT || 9091)
   })
   .catch((err) => console.log('Błąd synchronizacji:', err))
