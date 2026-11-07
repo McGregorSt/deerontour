@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node --test",
     "start": "nodemon app.js",
-    "build": "node --check app.js"
+    "build": "node --check app.js",
+    "migrate": "node migrate.js"
   },
   "author": "",
   "license": "ISC",
