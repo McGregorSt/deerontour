@@ -537,7 +537,7 @@ const Tours: React.FC = () => {
                       src={post.imageUrl || heroImage}
                       alt={post.title}
                       loading='lazy'
-                      onError={(event) => {
+                      onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
                         if (event.currentTarget.getAttribute('src') !== heroImage) {
                           event.currentTarget.src = heroImage
                         }

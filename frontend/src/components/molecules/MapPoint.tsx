@@ -146,7 +146,7 @@ const MapPoint: React.FC<MapPointProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsHovered(true)}
-      onBlur={(event) => {
+      onBlur={(event: React.FocusEvent<HTMLDivElement>) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
           setIsHovered(false)
           setIsDetailsOpen(false)

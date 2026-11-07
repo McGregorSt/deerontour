@@ -106,7 +106,7 @@ const Continent: React.FC<{
       $active={isActive}
       $variant={variant}
       aria-current={isActive ? 'page' : undefined}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLAnchorElement>) => {
         if (onSelect) {
           event.preventDefault()
           onSelect(isActive ? '' : normalizedContinent)

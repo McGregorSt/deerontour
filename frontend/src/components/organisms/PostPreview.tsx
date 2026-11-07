@@ -72,11 +72,11 @@ const StyledPostCardPhoto = styled.div`
 const PostPreview: React.FC<{ post: IPost }> = ({ post }) => {
   const navigate = useNavigate()
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     navigate(`/tours/details/${post.country.toLowerCase()}`)
   }
   return (
-    <StyledPostPreview onClick={(e) => handleClick(e)}>
+    <StyledPostPreview onClick={handleClick}>
       <StyledPostCardPhoto><PostCardPhoto imgSrc={post.postGallery || [[{src: ''}]]} /></StyledPostCardPhoto>
       <StyledContent>
         <StyledPostHeader>

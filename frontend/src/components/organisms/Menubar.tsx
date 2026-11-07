@@ -102,7 +102,7 @@ const StyledBrand = styled.div<{ $post: boolean }>`
     gap: 0.35rem;
     color: inherit;
   }
-  
+
   & > div > a > div:first-child {
     width: 3.75rem;
     height: 4.5rem;
