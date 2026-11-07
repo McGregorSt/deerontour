@@ -10,7 +10,9 @@
     "dev": "concurrently -k -n BACKEND,FRONTEND \"npm run start --workspace=blog_bc\" \"npm run start --workspace=my-app\"",
     "dev:backend": "npm run start --workspace=blog_bc",
     "dev:frontend": "npm run start --workspace=my-app",
-    "build": "npm run build --workspace=my-app"
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm run build --workspace=my-app",
+    "build:backend": "npm run build --workspace=blog_bc"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
